@@ -5,6 +5,7 @@ PYENV_PATH 	  := ./venv/bin/python3.10
 .PHONY: venv
 venv:
 	$(PYTHON_BINARY) -m venv venv
+	$(PYENV_PATH) -m pip install --upgrade pip
 
 .PHONY: setup-dev-env
 setup-dev-env: venv
