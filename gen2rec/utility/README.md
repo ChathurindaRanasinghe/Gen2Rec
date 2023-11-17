@@ -4,8 +4,8 @@
 
 To use token counter, use following methods.
 
-1. Use command `python utility/token_counter.py gpt-3.5-turbo "This is the text you want to analyze."`
-2. Use `from utility.token_counter import count_tokens` to import method and
+1. Use command `python gen2rec/utility/token_counter.py gpt-3.5-turbo "This is the text you want to analyze."`
+2. Use `from gen2rec.utility.token_counter import count_tokens` to import method and
    use `count_tokens(model, text)` method.
 
 Following are the encoding models that are supported.

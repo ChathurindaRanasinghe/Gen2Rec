@@ -10,7 +10,5 @@ Mainly consists of 4 components.
 ## Development
 To setup development environment please use following instructions.
 
-1. You need make sure that Python3.10 & Make are installed.
-2. First run `make setup-dev-env` to create a dev environment.
-3. To install dependencies for a component run `make setup-<componant>`
-example: `make setup-chat-interface`
+1. Make sure that Python3.10 & Make are installed.
+2. Run `make setup-dev-env` to create a dev environment.
