@@ -15,22 +15,6 @@ setup-dev-env: venv
 setup-test-env: venv
 	$(PYENV_PATH) -m pip install -r requirements-test.txt
 
-.PHONY: setup-chat-interface
-setup-chat-interface:
-	$(PYENV_PATH) -m pip install -r chat-interface/requirements.txt
-
-.PHONY: setup-evaluation-system
-setup-evaluation-system:
-	$(PYENV_PATH) -m pip install -r evaluation-system/requirements.txt
-
-.PHONY: setup-prompt-constructor
-setup-prompt-constructor:
-	$(PYENV_PATH) -m pip install -r prompt-constructor/requirements.txt
-
-.PHONY: setup-recommendation-engine
-setup-recommendation-engine:
-	$(PYENV_PATH) -m pip install -r recommendation-engine/requirements.txt
-
 .PHONY: delete-venv
 delete-venv:
 	rm -rf ./venv
