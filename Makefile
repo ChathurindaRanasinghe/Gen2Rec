@@ -18,3 +18,6 @@ setup-test-env: venv
 .PHONY: delete-venv
 delete-venv:
 	rm -rf ./venv
+
+.PHONY: run
+
