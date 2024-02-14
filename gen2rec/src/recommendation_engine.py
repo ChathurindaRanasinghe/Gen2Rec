@@ -2,40 +2,56 @@ import os
 import re
 from pprint import pprint
 
+import icecream as ic  # noqa: F401
 import pinecone
-import icecream as ic
+import redis
 from dotenv import load_dotenv
 from langchain.chains import RetrievalQA
-from langchain.chat_models import ChatOpenAI
-from langchain.document_loaders import CSVLoader
-from langchain.embeddings import OpenAIEmbeddings
-from langchain.vectorstores import Pinecone
-from langchain.vectorstores.redis import Redis
+from langchain_community.chat_models import ChatOpenAI
+from langchain_community.document_loaders import CSVLoader
+from langchain_community.vectorstores import Pinecone
+from langchain_community.vectorstores.redis import Redis
+from langchain_openai import OpenAIEmbeddings
 
 from gen2rec.src.prompts import recommendation_engine_prompt
 from gen2rec.utility.token_counter import count_tokens
 
 
-def get_vectorstore_from_csv(*, path: str, index_name: str, vector_store: str = 'redis'):
-    if vector_store is 'redis':
-        loader = CSVLoader(path)
-        data = clean_data(loader.load())
-        embeddings = OpenAIEmbeddings(model="text-embedding-ada-002", openai_api_key=os.environ.get("OPENAI_API_KEY"))
-        return Redis.from_documents(
-            documents=data,
-            embedding=embeddings,
-            redis_url="redis://localhost:6379",
-            index_name=index_name
-        )
+def get_vectorstore_from_csv(*, path: str, index_name: str, vector_store: str = "redis"):
+    embeddings = OpenAIEmbeddings(model="text-embedding-ada-002", openai_api_key=os.environ.get("OPENAI_API_KEY"))
+    if vector_store == "redis":
+        print("using redis")
+        redis_schema = f"./{index_name}.yaml"
+        redis_url = "redis://localhost:6379"
+        r = redis.Redis(host="localhost", port=6379, decode_responses=True)
 
+        try:
+            r.ft(index_name).info()
+            print('index found')
+            return Redis.from_existing_index(
+                embedding=embeddings,
+                index_name=index_name,
+                schema=redis_schema,
+                redis_url=redis_url
+            )
 
-    if vector_store is 'pinecone':
+        except Exception as _:
+            print('index not available')
+            loader = CSVLoader(path)
+            data = clean_data(loader.load())
+            
+            rds = Redis.from_documents(
+                documents=data, embedding=embeddings, redis_url=redis_url, index_name=index_name
+            )
+            rds.write_schema(redis_schema)
+            return rds
+
+    if vector_store == "pinecone":
         pinecone.init(
             api_key=os.environ.get("PINECONE_API_KEY"),
             environment=os.environ.get("PINECONE_ENVIRONMENT"),
         )
 
-        embeddings = OpenAIEmbeddings(model="text-embedding-ada-002", openai_api_key=os.environ.get("OPENAI_API_KEY"))
         if index_name in pinecone.list_indexes():
             return Pinecone.from_existing_index(index_name, embeddings)
         else:
@@ -57,7 +73,6 @@ def clean_data(data):
 def main():
     load_dotenv(dotenv_path="./.env")
     vectorstore = get_vectorstore_from_csv(path="./fixed2.csv", index_name="demo2")
-    print(type(vectorstore))
     qa_chain = RetrievalQA.from_chain_type(
         llm=ChatOpenAI(
             model_name="gpt-3.5-turbo",
@@ -68,7 +83,7 @@ def main():
         ),
         chain_type="stuff",
         retriever=vectorstore.as_retriever(),
-        chain_type_kwargs={'prompt': recommendation_engine_prompt}
+        chain_type_kwargs={"prompt": recommendation_engine_prompt},
     )
 
     while True:

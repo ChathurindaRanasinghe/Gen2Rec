@@ -6,6 +6,7 @@ PYENV_PATH 	  := ./venv/bin/python3.10
 venv:
 	$(PYTHON_BINARY) -m venv venv
 	$(PYENV_PATH) -m pip install --upgrade pip
+	$(PYENV_PATH) -m pip install -r requirements.txt
 
 .PHONY: setup-dev-env
 setup-dev-env: venv
@@ -20,4 +21,4 @@ delete-venv:
 	rm -rf ./venv
 
 .PHONY: run
-
+	$(PYENV_PATH) -m gen2rec/src/recommendation_engine.py

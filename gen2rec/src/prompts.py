@@ -10,5 +10,5 @@ RECOMMENDATION_ENGINE_PROMPT_TEMPLATE = """
     Question: {question}
     """
 recommendation_engine_prompt = PromptTemplate(
-    template=RECOMMENDATION_ENGINE_PROMPT_TEMPLATE, input_variables=['context', 'question']
+    template=RECOMMENDATION_ENGINE_PROMPT_TEMPLATE, input_variables=["context", "question"]
 )
