@@ -6,7 +6,7 @@ Datasets of 8 categories are available. These are used as the embeddings for dif
 
 | Category | Dataset                                                                               | Size   |
 |----------|---------------------------------------------------------------------------------------|--------|
-| Laptop   | Custom (scraped)                                                                      | -      |
+| Laptop   | Custom ([scraped](https://www.newegg.com))                                            | -      |
 | News     | [News Category Dataset](https://www.kaggle.com/datasets/rmisra/news-category-dataset) | 210294 |
 | Book     | [Amazon books](https://www.kaggle.com/datasets/ashwinshetgaonkar/amazonbooks)         | 1550   |
 | Movie    | [MovieLens](https://grouplens.org/datasets/movielens/)                                | 9742   |
