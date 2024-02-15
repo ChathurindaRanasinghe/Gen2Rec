@@ -1,7 +1,7 @@
 import csv
 import json
 
-with open('News_Category_Dataset_v3.json', 'r') as json_file:
+with open('data/News_Category_Dataset_v3.json', 'r') as json_file:
     json_data = json_file.readlines()
 
 first_entry = json.loads(json_data[0])

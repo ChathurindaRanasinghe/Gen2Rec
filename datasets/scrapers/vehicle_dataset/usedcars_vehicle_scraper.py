@@ -45,18 +45,18 @@ for x in range(0, 200):
 
     vehicle_links = [element['href'] for element in vehicle_elements]
     print(len(vehicle_links))
-    with open("scraped_links_" + str(x + 1) + ".txt", "w") as file:
+    with open("data/scraped_links" + ".txt", "w") as file:
         for link in vehicle_links:
             file.write(link + '\n')
 
-content = driver.page_source
+# content = driver.page_source
 driver.quit()
 
-soup = BeautifulSoup(content, 'html.parser')
-vehicle_elements = soup.find_all('a', {'class': 'sc-5a680332-4 jEbBWJ'})
-
-vehicle_links = [element['href'] for element in vehicle_elements]
-print(len(vehicle_links))
-with open("scraped_links.txt", "w") as file:
-    for link in vehicle_links:
-        file.write(link + '\n')
+# soup = BeautifulSoup(content, 'html.parser')
+# vehicle_elements = soup.find_all('a', {'class': 'sc-5a680332-4 jEbBWJ'})
+#
+# vehicle_links = [element['href'] for element in vehicle_elements]
+# print(len(vehicle_links))
+# with open("data/scraped_links.txt", "w") as file:
+#     for link in vehicle_links:
+#         file.write(link + '\n')

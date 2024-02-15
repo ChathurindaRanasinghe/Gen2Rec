@@ -1,7 +1,7 @@
 import csv
 import os
 
-directory = 'books'
+directory = 'data/books'
 all_data = []
 
 if os.path.exists('genres.csv'):
