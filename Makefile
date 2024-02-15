@@ -21,3 +21,7 @@ delete-venv:
 
 .PHONY: run
 
+.PHONY: run-ui
+run-ui:
+	streamlit run gen2rec\user-interface\chat_interface.py
+
