@@ -25,3 +25,13 @@ delete-venv:
 run-ui:
 	streamlit run gen2rec/user-interface/chat_interface.py
 
+# .PHONY: start-vecdb
+# start-vecdb:
+# 	docker run -p 6333:6333 -p 6334:6334 -v $(shell pwd)/qdrant_storage:/qdrant/storage:z qdrant/qdrant
+
+.PHONY: start-redis
+start-redis:
+	docker run -d -p 6379:6379 -p 8001:8001 -v $(shell pwd)/redis-local-data/:/data redis/redis-stack:latest
+
+
+# export PYTHONPATH="${PYTHONPATH}:$(pwd)"

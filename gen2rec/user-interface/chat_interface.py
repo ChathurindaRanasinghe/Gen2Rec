@@ -1,5 +1,6 @@
 import datetime
 from time import sleep
+from gen2rec.src.recommendation_engine import load
 
 import streamlit as st
 
@@ -30,12 +31,13 @@ def sidebar() -> dict:
                 min_value=datetime.date(2012, 1, 28),
                 format="YYYY.MM.DD",
             )
-        if options[CATEGORY] == BOOK:
-            options[USER_PROFILE] = st.text_area(label="User Profile")
+        # if options[CATEGORY] == BOOK:
+        #     options[USER_PROFILE] = st.text_area(label="User Profile")
         return options
 
 
 def chat_interface(options: dict) -> None:
+    qa_chain = load(options[CATEGORY].lower())
     st.subheader(options[CATEGORY] + " Recommendation")
 
     if "current_dataset" not in st.session_state or st.session_state.current_dataset != options[CATEGORY]:
@@ -51,8 +53,7 @@ def chat_interface(options: dict) -> None:
         st.session_state.messages.append({"role": "user", "content": prompt})
 
         with st.spinner(text="Please wait"):
-            sleep(2)
-            response = f"You said {prompt}"
+            response = qa_chain.invoke(input=prompt)['result']
             with st.chat_message("assistant"):
                 st.markdown(response)
             st.session_state.messages.append({"role": "assistant", "content": response})

@@ -11,3 +11,6 @@ qdrant_storage
 *.zip
 *.log
 .DS_Store
+redis-local-data
+*.rdb
+demo-*.yaml

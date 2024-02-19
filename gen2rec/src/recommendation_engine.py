@@ -1,44 +1,74 @@
+import json
+from operator import index
 import os
 import re
-import json
 from pprint import pprint
+from time import perf_counter
 
-import pinecone
 import icecream as ic
+import pinecone
 from dotenv import load_dotenv
 from langchain.chains import RetrievalQA
-from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_community.document_loaders import CSVLoader
-from langchain_community.vectorstores import Pinecone, Qdrant
+from langchain_community.vectorstores.qdrant import Qdrant
 from langchain_community.vectorstores.redis import Redis
+from langchain_community.vectorstores.pinecone import Pinecone
+from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+import redis
 
-from prompts import recommendation_engine_prompt
-from utility.token_counter import count_tokens
+from gen2rec.src.prompts import recommendation_engine_prompt, book_recommendation_prompt_template
+from gen2rec.utility.token_counter import count_tokens
+from qdrant_client import QdrantClient
+
 
 
 def get_vectorstore_from_csv(*, path: str, index_name: str, vector_store: str = "qdrant"):
     if vector_store == "redis":
-        loader = CSVLoader(path)
-        data = clean_data(loader.load())
-        print(f"token count = {sum(count_tokens(model='gpt-3.5-turbo', text=doc.page_content) for doc in data)}")
-        embeddings = OpenAIEmbeddings(model="text-embedding-ada-002", openai_api_key=os.environ.get("OPENAI_API_KEY"))
-        return Redis.from_documents(
-            documents=data,
-            embedding=embeddings,
-            redis_url="redis://localhost:6379",
-            index_name=index_name
+        r = redis.Redis(decode_responses=True)
+        encoding = "utf-8"
+        if index_name == "demo-book":
+            encoding = "latin1"
+        loader = CSVLoader(path, encoding=encoding)
+        if index_name == "demo-laptop":
+            data = clean_data(loader.load())
+        else:
+            data = loader.load()
+        # print(f"token count = {sum(count_tokens(model='gpt-3.5-turbo', text=doc.page_content) for doc in data)}")
+        embeddings = OpenAIEmbeddings(model="text-embedding-3-large", openai_api_key=os.environ.get("OPENAI_API_KEY"))
+        indexes = r.keys()
+        # print(f"{indexes=}")
+        for key in indexes:
+            if index_name in key:
+                print("Getting from existing index")
+                return Redis.from_existing_index(embedding=embeddings, index_name=index_name, schema=f"{index_name}.yaml",redis_url="redis://localhost:6379")    
+        
+        rds = Redis.from_documents(
+            documents=data, embedding=embeddings, redis_url="redis://localhost:6379", index_name=index_name
         )
+        rds.write_schema(f"{index_name}.yaml")
+        return rds
 
     if vector_store == "qdrant":
-        loader = CSVLoader(path)
-        data = clean_data(loader.load())
+        # client = QdrantClient("localhost", port=6333)
+        # collections = client.get_collections()
+        encoding = "utf-8"
+        if index_name == "demo-book":
+            encoding = "latin1"
+        loader = CSVLoader(path, encoding=encoding)
+        if index_name == "demo-laptop":
+            data = clean_data(loader.load())
+        else:
+            data = loader.load()
+        print("loaded data")
         embeddings = OpenAIEmbeddings(model="text-embedding-3-large", openai_api_key=os.environ.get("OPENAI_API_KEY"))
+        print("got embeddings")
         return Qdrant.from_documents(
             data,
             embeddings,
             url="0.0.0.0:6333",
             prefer_grpc=True,
             collection_name=index_name,
+            force_recreate=False
         )
 
     if vector_store == "pinecone":
@@ -65,16 +95,22 @@ def clean_data(data):
         doc.page_content = "\n".join(doc.page_content.split("\n")[1:])
     return data
 
+
 class Dataset:
     def __init__(self, name, path) -> None:
         self.name = name
         self.path = path
 
 
-def main():
+def load(dataset):
 
     load_dotenv(dotenv_path="./.env")
-    vectorstore = get_vectorstore_from_csv(path="./laptop.csv", index_name="demo-laptop")
+    vectorstore = get_vectorstore_from_csv(path=f"./{dataset}.csv", index_name=f"demo-{dataset}", vector_store="redis")
+
+    if dataset == "laptop":
+        prompt = recommendation_engine_prompt
+    if dataset == "book":
+        prompt = book_recommendation_prompt_template
 
     qa_chain = RetrievalQA.from_chain_type(
         llm=ChatOpenAI(
@@ -85,18 +121,13 @@ def main():
             temperature=0.2,
         ),
         chain_type="stuff",
-        retriever=vectorstore.as_retriever(search_kwargs={"k": 1}),
-        chain_type_kwargs={"prompt": recommendation_engine_prompt},
+        retriever=vectorstore.as_retriever(search_type="similarity", search_kwargs={"k": 5}),
+        chain_type_kwargs={"prompt": prompt},
         return_source_documents=True,
     )
 
-    while True:
-        user_query = input("Enter Query: ").strip()
-        if user_query == "q":
-            break
-        result = qa_chain.invoke(input=user_query)
-        pprint(result['result'])
+    return qa_chain
 
-
-if __name__ == "__main__":
-    main()
+if __name__ == '__main__':
+    load("laptop")
+    load("book")
