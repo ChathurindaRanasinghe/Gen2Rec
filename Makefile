@@ -19,5 +19,14 @@ setup-test-env: venv
 delete-venv:
 	rm -rf ./venv
 
-.PHONY: run
+.PHONY: run-laptop-pipeline
+run-laptop-pipeline:
+	$(PYENV_PATH) datasets/laptop-dataset/laptop_dataset_pipeline.py
 
+.PHONY: run
+run:
+	$(PYENV_PATH) gen2rec/src/recommendation_engine.py
+
+.PHONY: start-vecdb
+start-vecdb:
+	docker run -p 6333:6333 -p 6334:6334 -v $(shell pwd)/qdrant_storage:/qdrant/storage:z qdrant/qdrant

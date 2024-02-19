@@ -6,3 +6,8 @@ __pycache__
 .env
 *.pyc
 *.json
+qdrant_storage
+*.csv
+*.zip
+*.log
+.DS_Store
