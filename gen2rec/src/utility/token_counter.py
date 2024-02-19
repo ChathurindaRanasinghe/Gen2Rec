@@ -1,4 +1,4 @@
-import argparse
+import sys
 
 import tiktoken
 
@@ -21,12 +21,5 @@ def count_tokens(model: str, text: str) -> int:
 
 
 if __name__ == "__main__":
-    parser: argparse.ArgumentParser = argparse.ArgumentParser()
-
-    parser.add_argument("model_name")
-    parser.add_argument("text")
-
-    args: argparse.Namespace = parser.parse_args()
-
-    num_tokens: int = count_tokens(args.model_name, args.text)
+    num_tokens = count_tokens(sys.argv[1], sys.argv[2])
     print(f"Token count: {num_tokens}")
