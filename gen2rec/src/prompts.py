@@ -20,7 +20,8 @@ recommendation_engine_prompt = PromptTemplate(
 )
 
 NEWS_ENGINE = """
-Assume you are a news recommendation system. You need to recommend news according to user interests from the provided news data.
+Assume you are a news recommendation system. You need to recommend news according to user interests & preference from the provided news data.
+
 CONTEXT: {context}
 
 QUESTION: {question}
@@ -33,6 +34,7 @@ news_prompt = PromptTemplate(
 
 BOOK_RECOMMENDATION_PROMPT = """
 Assume you are an experienced book reader. Your task is to recommend books to a user based on user preferences from the given set of books.
+Provide the a simple description of the book, rating and price.
 
 CONTEXT: {context}
 
@@ -44,3 +46,12 @@ book_recommendation_prompt_template = PromptTemplate(
     template=BOOK_RECOMMENDATION_PROMPT, input_variables=['context', 'question']
 )
 # Can you recommend me a laptop for video editing
+
+#"""
+#Assume you are an experienced book reader. Your task is to recommend books to a user based on user preferences from the given set of books.
+
+#CONTEXT: {context}
+
+#QUESTION: {question}
+
+#Helpful Answer"""

@@ -24,12 +24,8 @@ def sidebar() -> dict:
         if options[CATEGORY] == NEWS:
             options[USER_PROFILE] = st.text_area(label="User Profile")
             options[LOCATION] = st.text_input(label="Location")
-            options[DATE_RANGE] = st.date_input(
+            options[DATE_RANGE] = st.text_input(
                 label="Date",
-                value=(datetime.date(2022, 1, 1), datetime.date(2022, 1, 7)),
-                max_value=datetime.date(2022, 9, 23),
-                min_value=datetime.date(2012, 1, 28),
-                format="YYYY.MM.DD",
             )
         # if options[CATEGORY] == BOOK:
         #     options[USER_PROFILE] = st.text_area(label="User Profile")
@@ -37,7 +33,8 @@ def sidebar() -> dict:
 
 
 def chat_interface(options: dict) -> None:
-    qa_chain = load(options[CATEGORY].lower())
+    dataset = options[CATEGORY].lower()
+    qa_chain = load(dataset)
     st.subheader(options[CATEGORY] + " Recommendation")
 
     if "current_dataset" not in st.session_state or st.session_state.current_dataset != options[CATEGORY]:
@@ -53,6 +50,10 @@ def chat_interface(options: dict) -> None:
         st.session_state.messages.append({"role": "user", "content": prompt})
 
         with st.spinner(text="Please wait"):
+            if dataset == "news":
+                prompt = f"""I am interested in {options[USER_PROFILE]}.
+LOCATION: {options[LOCATION]}
+DATE: 2022 November"""
             response = qa_chain.invoke(input=prompt)['result']
             with st.chat_message("assistant"):
                 st.markdown(response)

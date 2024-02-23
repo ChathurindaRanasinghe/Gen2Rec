@@ -10,6 +10,6 @@ print(df.shape)
 df.drop(columns=['sentiment'], inplace=True)
 
 df.drop(columns=df.columns[0], axis=1, inplace=True)
-print(df.columns)
+print(df.shape)
 df.to_csv("news.csv", index=False)
 

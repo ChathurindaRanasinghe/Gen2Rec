@@ -16,7 +16,7 @@ from langchain_community.vectorstores.pinecone import Pinecone
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 import redis
 
-from gen2rec.src.prompts import recommendation_engine_prompt, book_recommendation_prompt_template
+from gen2rec.src.prompts import recommendation_engine_prompt, book_recommendation_prompt_template, news_prompt
 from gen2rec.utility.token_counter import count_tokens
 from qdrant_client import QdrantClient
 
@@ -26,7 +26,7 @@ def get_vectorstore_from_csv(*, path: str, index_name: str, vector_store: str = 
     if vector_store == "redis":
         r = redis.Redis(decode_responses=True)
         encoding = "utf-8"
-        if index_name == "demo-book":
+        if index_name == "demo-book" or index_name == "demo-news":
             encoding = "latin1"
         loader = CSVLoader(path, encoding=encoding)
         if index_name == "demo-laptop":
@@ -52,7 +52,7 @@ def get_vectorstore_from_csv(*, path: str, index_name: str, vector_store: str = 
         # client = QdrantClient("localhost", port=6333)
         # collections = client.get_collections()
         encoding = "utf-8"
-        if index_name == "demo-book":
+        if index_name == "demo-book" or index_name == "demo-news":
             encoding = "latin1"
         loader = CSVLoader(path, encoding=encoding)
         if index_name == "demo-laptop":
@@ -111,6 +111,8 @@ def load(dataset):
         prompt = recommendation_engine_prompt
     if dataset == "book":
         prompt = book_recommendation_prompt_template
+    if dataset == "news":
+        prompt = news_prompt
 
     qa_chain = RetrievalQA.from_chain_type(
         llm=ChatOpenAI(
@@ -128,6 +130,6 @@ def load(dataset):
 
     return qa_chain
 
-if __name__ == '__main__':
-    load("laptop")
-    load("book")
+# if __name__ == '__main__':
+#     load("news")
+    # load("book")
