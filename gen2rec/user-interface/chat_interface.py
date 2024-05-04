@@ -33,7 +33,7 @@ def sidebar() -> dict:
 
 
 def chat_interface(options: dict) -> None:
-    dataset = options[CATEGORY].lower()
+    dataset = NEWS.lower()
     qa_chain = load(dataset)
     st.subheader(options[CATEGORY] + " Recommendation")
 
