@@ -32,7 +32,7 @@ for user_id in set(list(user_purchased_games.keys()) + list(user_played_games.ke
     userwise_data = userwise_data._append(
         {'User ID': user_id, 'Purchased Games': purchased_games, 'Played Games': played_games}, ignore_index=True)
 
-userwise_data.to_csv("../games_dataset(userwise).csv", index=False)
+userwise_data.to_csv("../game_dataset(userwise).csv", index=False)
 print("CSV file has been successfully created.")
 
 purchased_count = purchased_data.groupby('Game Name').size().reset_index(name='Purchased Count')
@@ -41,5 +41,5 @@ play_hours = played_data.groupby('Game Name')[
 gamewise_data = pd.merge(purchased_count, play_hours, on='Game Name', how='outer').fillna(0)
 
 gamewise_data.rename(columns={'Hours if behavior is play, 1.0 if behavior is purchase': 'Hours Played'}, inplace=True)
-gamewise_data.to_csv("../games_dataset(gamewise).csv", index=False)
+gamewise_data.to_csv("../game_dataset(gamewise).csv", index=False)
 print("CSV file has been successfully created.")
