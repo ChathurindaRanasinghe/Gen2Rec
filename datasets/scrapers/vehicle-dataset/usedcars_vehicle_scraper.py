@@ -10,13 +10,13 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 WEBSITE_URL = 'https://www.usedcars.com'
 PARAMS = '/buy'
+DRIVER_PATH = 'D:/Inbox/project-Gen2Rec/chromedriver-win64/chromedriver.exe'
 
 
 def get_driver() -> WebDriver:
-    path = 'D:/Inbox/project-Gen2Rec/chromedriver-win64/chromedriver.exe'
     chrome_options = webdriver.ChromeOptions()
     chrome_options.add_argument('--blink-settings=imagesEnabled=false')
-    return webdriver.Chrome(executable_path=path, chrome_options=chrome_options)
+    return webdriver.Chrome(executable_path=DRIVER_PATH, chrome_options=chrome_options)
 
 
 def get_content(driver: WebDriver, level: int) -> str:
@@ -115,5 +115,5 @@ def get_details() -> None:
 
 
 if __name__ == "__main__":
-    # get_links()
-    get_details()
+    get_links()
+    # get_details()
