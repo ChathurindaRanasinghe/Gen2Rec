@@ -44,7 +44,7 @@ def get_content(driver: WebDriver, level: int) -> str:
         sleep(5)
         vehicle_links = scrape_links(driver.page_source)
         save_links(vehicle_links)
-        return driver.page_source
+    return driver.page_source
 
 
 def scrape_links(content: str) -> list:
@@ -63,7 +63,7 @@ def save_links(vehicle_links: list) -> None:
 
 def get_links() -> None:
     driver = get_driver()
-    content = get_content(driver, level=200)
+    content = get_content(driver, level=100)
     vehicle_links = scrape_links(content)
     save_links(vehicle_links)
     driver.quit()
@@ -81,7 +81,7 @@ def scrape_details(soup: BeautifulSoup) -> dict:
     try:
         details = {
             "name": soup.find('h1', {'class': 'sc-62e5a65e-0 kWFIdk'}).text.strip(),
-            "price": soup.find('p', {'class': 'sc-136c207a-16 eTTCNG'}).text.strip(),
+            "price": soup.find('p', {'class': 'sc-35cccf38-16 lijBWx'}).text.strip(),
             "overview": [span.text.strip() for span in soup.find_all('span', {'class': 'sc-d13ff064-4 jXiDwC'})],
             "features": [span.text.strip() for span in soup.find_all('span', {'class': 'sc-11aa6444-3 edIwFs'})],
             "history": [span.text.strip() for span in soup.find_all('div', {'class': 'sc-8f7178d0-9 lfhAiN'})],
@@ -115,5 +115,5 @@ def get_details() -> None:
 
 
 if __name__ == "__main__":
-    get_links()
-    # get_details()
+    # get_links()
+    get_details()
