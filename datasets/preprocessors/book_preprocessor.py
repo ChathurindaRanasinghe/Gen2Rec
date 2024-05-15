@@ -7,6 +7,16 @@ import requests
 directory = 'data/books'
 all_data = []
 
+
+def extract_numeric_rating(rating_str):
+    try:
+        if rating_str:
+            return float(rating_str.split()[0])
+    except ValueError:
+        return None
+    return None
+
+
 if os.path.exists('genres.csv'):
     os.remove('genres.csv')
 
@@ -39,5 +49,18 @@ with open(output_file, 'w', newline='', encoding='utf-8') as csv_file:
     writer = csv.writer(csv_file)
     writer.writerow(['Category'] + ['Title'] + ['Author'] + ['Type'] + ['Rating'] + ['Price'] + ['Description'])
     writer.writerows(all_data)
+
+with open(output_file, mode='r', encoding='utf-8') as infile:
+    reader = csv.DictReader(infile)
+    rows = list(reader)
+
+for row in rows:
+    row['Rating'] = extract_numeric_rating(row['Rating'])
+
+with open(output_file, mode='w', newline='', encoding='utf-8') as outfile:
+    fieldnames = reader.fieldnames
+    writer = csv.DictWriter(outfile, fieldnames=fieldnames)
+    writer.writeheader()
+    writer.writerows(rows)
 
 print("CSV file has been successfully created.")
