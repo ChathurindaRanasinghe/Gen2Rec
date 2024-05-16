@@ -73,4 +73,16 @@ with open('../movie_dataset.csv', 'w', newline='', encoding='utf-8') as csvfile:
     for movie in movie_data:
         writer.writerow(movie)
 
+filtered_rows = []
+for field_index, fieldname in enumerate(fieldnames):
+    with open('../movie_dataset.csv', 'r', newline='', encoding='utf-8') as file:
+        reader = csv.reader(file)
+        rows = [row for row in reader if len(row) > field_index and row[field_index]]
+        filtered_rows.append(rows)
+
+for i, rows in enumerate(filtered_rows):
+    with open(f'../movie_dataset.csv', 'w', newline='', encoding='utf-8') as file:
+        writer = csv.writer(file)
+        writer.writerows(rows)
+
 print("CSV file has been successfully created.")
