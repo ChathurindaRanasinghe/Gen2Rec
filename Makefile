@@ -25,3 +25,6 @@ delete-venv:
 run-ui:
 	streamlit run gen2rec/user-interface/chat_interface.py
 
+.PHONY: run-book-ui
+run-book-ui:
+	streamlit run gen2rec/user-interface/book_ui.py
