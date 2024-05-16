@@ -1,13 +1,9 @@
-import datetime
 from time import sleep
 
 import streamlit as st
 
 # options
 CATEGORY: str = "Category"
-USER_PROFILE: str = "UserProfile"
-LOCATION: str = "Location"
-DATE_RANGE: str = "DateRange"
 
 # datasets
 LAPTOP: str = "Laptop"
@@ -20,18 +16,6 @@ def sidebar() -> dict:
         st.header("Options")
         st.divider()
         options = {CATEGORY: st.selectbox(label="Category", options=[LAPTOP, NEWS, BOOK])}
-        if options[CATEGORY] == NEWS:
-            options[USER_PROFILE] = st.text_area(label="User Profile")
-            options[LOCATION] = st.text_input(label="Location")
-            options[DATE_RANGE] = st.date_input(
-                label="Date",
-                value=(datetime.date(2022, 1, 1), datetime.date(2022, 1, 7)),
-                max_value=datetime.date(2022, 9, 23),
-                min_value=datetime.date(2012, 1, 28),
-                format="YYYY.MM.DD",
-            )
-        if options[CATEGORY] == BOOK:
-            options[USER_PROFILE] = st.text_area(label="User Profile")
         return options
 
 
