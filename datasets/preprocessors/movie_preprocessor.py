@@ -4,6 +4,20 @@ movie_data = []
 with open('data\movies.csv', newline='', encoding='utf-8') as csvfile:
     reader = csv.DictReader(csvfile)
     for row in reader:
+        title_parts = row['title'].rsplit(' ', 1)
+        if len(title_parts) == 2:
+            movie_name, year = title_parts
+            year = year.strip('()')
+        else:
+            movie_name = row['title']
+            year = None
+        row['movie_name'] = movie_name
+        row['year'] = year
+        row['genres'] = row['genres'].replace('|', ', ')
+        del row['title']
+        movie_id = row.pop('movieId', None)
+        if movie_id:
+            row['movieId'] = movie_id
         movie_data.append(row)
 
 ratings_data = []
@@ -29,7 +43,7 @@ for tag in tags_data:
 for movie in movie_data:
     movie_id = movie['movieId']
     if movie_id in movie_tags:
-        movie['tags'] = '|'.join(movie_tags[movie_id])
+        movie['tags'] = ', '.join(movie_tags[movie_id])
     else:
         movie['tags'] = None
 
@@ -52,7 +66,7 @@ for movie in movie_data:
     else:
         movie['average_rating'] = None
 
-fieldnames = ['movieId', 'title', 'genres', 'tags', 'average_rating']
+fieldnames = ['movieId', 'movie_name', 'year', 'genres', 'tags', 'average_rating']
 with open('../movie_dataset.csv', 'w', newline='', encoding='utf-8') as csvfile:
     writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
     writer.writeheader()
