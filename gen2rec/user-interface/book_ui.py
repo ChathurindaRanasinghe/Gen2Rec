@@ -1,4 +1,5 @@
 from streamlit_float import *
+from streamlit_card import card
 
 st.set_page_config(layout="wide")
 
@@ -12,6 +13,28 @@ with col1:
     with st.container():
         st.header("Gen2Rec")
         st.subheader("Book Recommendations")
+        card(
+            title="Streamlit Card",
+            text=["This is a test card", "This is a subtext"],
+            image="https://placekitten.com/500/500",
+            styles={
+                "card": {
+                    "width": "100%",
+                    "height": "100px",
+                    "border-radius": "10px",
+                    "box-shadow": "0 0 10px rgba(0,0,0,0.5)",
+                    "margin-left": "0",
+                    "text-align": "left",  # Aligns text to the left within the card
+                    "padding": "10px"  # Adds padding to ensure content is not flush with the edge
+                },
+                "title": {
+                    "text-align": "left",  # Aligns the title to the left
+                },
+                "text": {
+                    "text-align": "left",  # Aligns the text to the left
+                }
+            }
+        )
 
 with col2:
     with st.expander("Chat Interface"):
