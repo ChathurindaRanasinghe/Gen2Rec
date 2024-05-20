@@ -27,4 +27,4 @@ run-ui:
 
 .PHONY: run-book-ui
 run-book-ui:
-	streamlit run gen2rec/user-interface/book_ui.py
+	python gen2rec/user-interface/client_interface.py --category "BOOK" --server_port 8001
