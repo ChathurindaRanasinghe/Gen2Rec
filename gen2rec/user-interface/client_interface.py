@@ -3,15 +3,24 @@ from time import sleep
 
 import gradio as gr
 
-parser = argparse.ArgumentParser(description="Launch Client Interface for a Category")
-parser.add_argument("--category", type=str, required=True, help="Category to use in the recommendation")
-parser.add_argument("--server_port", type=int, default=8001, help="Port number to host the app")
-args = parser.parse_args()
-
-CATEGORY = args.category
+INITIALIZED = False
+CATEGORY = ""
+TITLE = "Gen2Rec"
 LIST = "List"
 CHAT = "Chat"
 VISIBILITY = {LIST: True, CHAT: True}
+
+
+def initialize(recommendation_category, recommendation_fields):
+    fields = [item.strip() for item in recommendation_fields.split(',')]
+    print(fields)
+    if recommendation_category != "":
+        print(recommendation_category)
+
+    CATEGORY = recommendation_category
+    INITIALIZED = True
+    return gr.update(interactive=INITIALIZED), gr.update(interactive=INITIALIZED), gr.update(
+        value="Successfully initialized"), gr.update(value=f"# {TITLE} - {CATEGORY.capitalize()} Recommendation")
 
 
 def chat_response(message, history):
@@ -47,9 +56,32 @@ css = """
 """
 
 with gr.Blocks(css=css) as demo:
-    gr.Markdown(f"# {CATEGORY.capitalize()} Recommendation with Gen2Rec")
+    title_display = gr.Markdown(value=f"# {TITLE}")
+
     with gr.Tabs():
-        with gr.TabItem("Recommendations"):
+        init_tab = gr.TabItem("Initialization")
+        configuration_tab = gr.TabItem("Configurations", interactive=INITIALIZED)
+        recommendation_tab = gr.TabItem("Recommendations", interactive=INITIALIZED)
+
+        with init_tab:
+            with gr.Row():
+                with gr.Column():
+                    recommendation_category = gr.Textbox(label="Recommendation Category")
+                    with gr.Row():
+                        dataset_file = gr.UploadButton("Upload dataset", type="binary")
+                        improve_dataset = gr.Checkbox(label="Improve dataset")
+                    recommendation_fields = gr.Textbox(
+                        label="Specify the fields required in recommendations (Use comma separation if multiple fields "
+                              "required)")
+                with gr.Column():
+                    gr.Markdown("Configurations List")
+            with gr.Row():
+                message = gr.Button("Initialize to continue", interactive=False)
+                init = gr.Button("Initialize")
+                init.click(initialize, inputs=[recommendation_category, recommendation_fields],
+                           outputs=[recommendation_tab, configuration_tab, message, title_display])
+
+        with recommendation_tab:
             with gr.Row():
                 list_column = gr.Column(scale=1, visible=True, variant="panel")
                 with list_column:
@@ -67,7 +99,7 @@ with gr.Blocks(css=css) as demo:
                     submit = gr.Button("Send")
                     submit.click(chat_response, inputs=[message, chatbot], outputs=[message, chatbot])
 
-        with gr.TabItem("Configurations"):
+        with configuration_tab:
             visible = gr.CheckboxGroup([LIST, CHAT], label="Visible recommendation options", value=[LIST, CHAT])
             visible.change(change_visibility, inputs=visible, outputs=[list_column, chat_column])
             gr.Markdown("<hr>")
@@ -81,4 +113,8 @@ with gr.Blocks(css=css) as demo:
             submit.click(submit_configurations, inputs=[system_prompt, user_details, web_search], outputs=status)
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Launch Client Interface for a Category")
+    # parser.add_argument("--category", type=str, required=True, help="Category to use in the recommendation")
+    parser.add_argument("--server_port", type=int, default=8001, help="Port number to host the app")
+    args = parser.parse_args()
     demo.launch(server_port=args.server_port)
