@@ -9,7 +9,16 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
 WEBSITE_URL = 'https://www.usedcars.com'
-PARAMS = '/buy'
+# PARAMS = ['/buy']
+PARAMS = ['/buy/bodyTypes-convertible',
+          '/buy/bodyTypes-coupe',
+          '/buy/bodyTypes-hatchback',
+          '/buy/bodyTypes-minivan',
+          '/buy/bodyTypes-sedan',
+          '/buy/bodyTypes-suv',
+          '/buy/bodyTypes-truck',
+          '/buy/bodyTypes-van',
+          '/buy/bodyTypes-wagon']
 DRIVER_PATH = 'D:/Inbox/project-Gen2Rec/chromedriver-win64/chromedriver.exe'
 
 
@@ -19,8 +28,9 @@ def get_driver() -> WebDriver:
     return webdriver.Chrome(executable_path=DRIVER_PATH, chrome_options=chrome_options)
 
 
-def get_content(driver: WebDriver, level: int) -> str:
-    driver.get(WEBSITE_URL + PARAMS)
+def get_content(driver: WebDriver, param: str, level: int) -> str:
+    print(WEBSITE_URL + param)
+    driver.get(WEBSITE_URL + param)
     sleep(10)
     for x in range(0, level):
         print('level ' + str(x + 1))
@@ -63,7 +73,9 @@ def save_links(vehicle_links: list) -> None:
 
 def get_links() -> None:
     driver = get_driver()
-    content = get_content(driver, level=100)
+    content = None
+    for param in PARAMS:
+        content = get_content(driver, param, level=20)
     vehicle_links = scrape_links(content)
     save_links(vehicle_links)
     driver.quit()
@@ -115,5 +127,5 @@ def get_details() -> None:
 
 
 if __name__ == "__main__":
-    # get_links()
-    get_details()
+    get_links()
+    # get_details()
