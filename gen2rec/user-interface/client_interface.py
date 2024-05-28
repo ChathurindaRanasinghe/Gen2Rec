@@ -1,4 +1,5 @@
 import argparse
+import json
 from time import sleep
 
 import gradio as gr
@@ -9,11 +10,12 @@ TITLE = "Gen2Rec"
 LIST = "List"
 CHAT = "Chat"
 VISIBILITY = {LIST: True, CHAT: True}
+FIELDS = []
 
 
 def initialize(recommendation_category, recommendation_fields):
-    fields = [item.strip() for item in recommendation_fields.split(',')]
-    print(fields)
+    FIELDS = list(json.loads(recommendation_fields).keys())
+    print(FIELDS)
     if recommendation_category != "":
         print(recommendation_category)
 
@@ -59,7 +61,7 @@ footer {
 }
 """
 
-with gr.Blocks(css=css, title="Gen2Rec") as demo:
+with gr.Blocks(css=css, title=TITLE) as demo:
     title_display = gr.Markdown(value=f"# {TITLE}")
 
     with gr.Tabs():
@@ -73,10 +75,8 @@ with gr.Blocks(css=css, title="Gen2Rec") as demo:
                     recommendation_category = gr.Textbox(label="Recommendation Category")
                     with gr.Row():
                         dataset_file = gr.UploadButton("Upload dataset", type="binary")
-                        improve_dataset = gr.Checkbox(label="Improve dataset")
-                    recommendation_fields = gr.Textbox(
-                        label="Specify the fields required in recommendations (Use comma separation if multiple fields "
-                              "required)")
+                        improve_dataset = gr.Checkbox(label="Improve dataset with additional data")
+                    recommendation_fields = gr.Textbox(label="Specify the fields in JSON format", lines=5)
                 with gr.Column():
                     gr.Markdown("Configurations List")
             with gr.Row():
