@@ -48,6 +48,10 @@ def submit_configurations(system_prompt, user_details, web_search):
 
 
 css = """
+footer {
+    visibility: hidden
+}
+
 .card {
     background-color: gray;
     padding: 10px;
@@ -55,7 +59,7 @@ css = """
 }
 """
 
-with gr.Blocks(css=css) as demo:
+with gr.Blocks(css=css, title="Gen2Rec") as demo:
     title_display = gr.Markdown(value=f"# {TITLE}")
 
     with gr.Tabs():
@@ -113,8 +117,7 @@ with gr.Blocks(css=css) as demo:
             submit.click(submit_configurations, inputs=[system_prompt, user_details, web_search], outputs=status)
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Launch Client Interface for a Category")
-    # parser.add_argument("--category", type=str, required=True, help="Category to use in the recommendation")
+    parser = argparse.ArgumentParser(description="Launch Client Interface")
     parser.add_argument("--server_port", type=int, default=8001, help="Port number to host the app")
     args = parser.parse_args()
-    demo.launch(server_port=args.server_port)
+    demo.launch(server_port=args.server_port, show_api=False)
