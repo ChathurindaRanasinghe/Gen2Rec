@@ -1,23 +1,24 @@
 import argparse
+import json
 from time import sleep
 
 import gradio as gr
 
-INITIALIZED = False
-CATEGORY = ""
-TITLE = "Gen2Rec"
-LIST = "List"
-CHAT = "Chat"
-VISIBILITY = {LIST: True, CHAT: True}
-FIELDS = []
+TITLE: str = "Gen2Rec"
+INITIALIZED: bool = False
+CATEGORY: str = ""
+LIST: str = "List"
+CHAT: str = "Chat"
+VISIBILITY: dict = {LIST: True, CHAT: True}
+FIELDS: list = []
 
 
-def get_fields(recommendation_fields):
+def get_fields(recommendation_fields: json) -> list[str]:
     # return list(json.loads(recommendation_fields).keys())
     return ["movie", "year", "genres", "average_rating"]
 
 
-def initialize(recommendation_category, recommendation_fields):
+def initialize(recommendation_category: str, recommendation_fields: json) -> tuple:
     FIELDS = get_fields(recommendation_fields)
     print(FIELDS)
 
@@ -30,22 +31,23 @@ def initialize(recommendation_category, recommendation_fields):
         value="Successfully initialized"), gr.update(value=f"# {TITLE} - {CATEGORY.capitalize()} Recommendation")
 
 
-def change_visibility(visible):
+def change_visibility(visible: list) -> tuple:
     VISIBILITY[LIST] = LIST in visible
     VISIBILITY[CHAT] = CHAT in visible
     return gr.update(visible=VISIBILITY[LIST]), gr.update(visible=VISIBILITY[CHAT])
 
 
-def submit_configurations(system_prompt, user_details, web_search):
+def submit_configurations(system_prompt: str, user_details: str, web_search: bool) -> dict:
+    status: str = "Error in configuration"
     print(system_prompt)
     print(user_details)
     print(web_search)
     sleep(2)
-    response = True
-    return "Configurations updated" if response else "Error in configuration"
+    status = "Configurations updated"
+    return gr.update(value=status)
 
 
-def get_recommendation_list():
+def get_recommendation_list() -> list[dict]:
     return [
         {
             "page_content": "tags: \n",
@@ -89,16 +91,16 @@ def get_recommendation_list():
     ]
 
 
-def chat_response(message, history):
-    history = history or []
+def chat_response(message: str, history: list[str]) -> tuple[str, list]:
+    history: list = history or []
     if message:
-        bot_response = f"{message[::-1]}"
+        bot_response: str = f"{message[::-1]}"
         history.append([message, bot_response])
         sleep(2)
     return "", history
 
 
-css = """
+css: str = '''
 footer {
     visibility: hidden
 }
@@ -109,36 +111,35 @@ footer {
     padding: 10px;
     border-radius:10px;
 }
-"""
+'''
 
 with gr.Blocks(css=css, title=TITLE) as demo:
     title_display = gr.Markdown(value=f"# {TITLE}")
 
     with gr.Tabs():
-        init_tab = gr.TabItem("Initialization")
-        configuration_tab = gr.TabItem("Configurations", interactive=INITIALIZED)
-        recommendation_tab = gr.TabItem("Recommendations", interactive=INITIALIZED)
+        init_tab = gr.TabItem(label="Initialization")
+        configuration_tab = gr.TabItem(label="Configurations", interactive=INITIALIZED)
+        recommendation_tab = gr.TabItem(label="Recommendations", interactive=INITIALIZED)
 
         with init_tab:
             with gr.Row():
                 with gr.Column():
                     recommendation_category = gr.Textbox(label="Recommendation Category")
                     with gr.Row():
-                        dataset_file = gr.UploadButton("Upload dataset", type="binary")
+                        dataset_file = gr.UploadButton(label="Upload dataset", type="binary")
                         improve_dataset = gr.Checkbox(label="Improve dataset with additional data")
                     recommendation_fields = gr.Textbox(label="Specify the fields in JSON format", lines=5)
                 with gr.Column():
-                    gr.Markdown("Configurations List")
+                    gr.Markdown(value="Configurations List")
             with gr.Row():
-                message = gr.Button("Initialize to continue", interactive=False)
-                init = gr.Button("Initialize")
-                init.click(initialize, inputs=[recommendation_category, recommendation_fields],
+                message = gr.Button(value="Initialize to continue", interactive=False)
+                init = gr.Button(value="Initialize")
+                init.click(fn=initialize, inputs=[recommendation_category, recommendation_fields],
                            outputs=[recommendation_tab, configuration_tab, message, title_display])
 
         with recommendation_tab:
             with gr.Row():
-                list_column = gr.Column(scale=1, visible=True, variant="panel")
-                with list_column:
+                with gr.Column(visible=True, variant="panel") as list_column:
                     def update_recommendations():
                         recommendations_html = ""
                         for rec in get_recommendation_list():
@@ -150,33 +151,32 @@ with gr.Blocks(css=css, title=TITLE) as demo:
                         return gr.update(value=recommendations_html)
 
 
-                    refresh = gr.Button("Recommendation List")
+                    refresh = gr.Button(value="Recommendation List")
                     recommendation_list = gr.HTML()
-                    refresh.click(update_recommendations, outputs=recommendation_list)
+                    refresh.click(fn=update_recommendations, outputs=recommendation_list)
 
-                chat_column = gr.Column(scale=1, visible=True)
-                with chat_column:
-                    gr.Markdown("Recommendation Chat Interface")
+                with gr.Column(visible=True) as chat_column:
+                    gr.Markdown(value="Recommendation Chat Interface")
                     chatbot = gr.Chatbot()
                     message = gr.Textbox(show_label=False)
-                    submit = gr.Button("Send")
-                    submit.click(chat_response, inputs=[message, chatbot], outputs=[message, chatbot])
+                    submit = gr.Button(value="Send")
+                    submit.click(fn=chat_response, inputs=[message, chatbot], outputs=[message, chatbot])
 
         with configuration_tab:
-            visible = gr.CheckboxGroup([LIST, CHAT], label="Visible recommendation options", value=[LIST, CHAT])
-            visible.change(change_visibility, inputs=visible, outputs=[list_column, chat_column])
-            gr.Markdown("<hr>")
-            gr.Markdown("Recommendation System Configurations")
+            visible = gr.CheckboxGroup(choices=[LIST, CHAT], label="Visible recommendation options", value=[LIST, CHAT])
+            visible.change(fn=change_visibility, inputs=visible, outputs=[list_column, chat_column])
+            gr.Markdown(value="<hr>")
+            gr.Markdown(value="Recommendation System Configurations")
             system_prompt = gr.Textbox(label="System prompt")
             user_details = gr.Textbox(label="User details")
             web_search = gr.Checkbox(label="Enable web search", value=False)
             with gr.Row():
-                status = gr.Button("Set configurations", interactive=False)
-                submit = gr.Button("Submit")
-            submit.click(submit_configurations, inputs=[system_prompt, user_details, web_search], outputs=status)
+                status = gr.Button(value="Set configurations", interactive=False)
+                submit = gr.Button(value="Submit")
+            submit.click(fn=submit_configurations, inputs=[system_prompt, user_details, web_search], outputs=status)
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Launch Client Interface")
+    parser: argparse.ArgumentParser = argparse.ArgumentParser(description="Launch Client Interface")
     parser.add_argument("--server_port", type=int, default=8001, help="Port number to host the app")
     args = parser.parse_args()
     demo.launch(server_port=args.server_port, show_api=False)
