@@ -35,7 +35,10 @@ def get_content(driver: WebDriver, param: str, level: int) -> str:
     for x in range(0, level):
         print('level ' + str(x + 1))
         button = None
+        not_found = 0
         while not button:
+            if not_found > 20:
+                break
             driver.execute_script("window.scrollBy(0, 500);")
             sleep(1)
             try:
@@ -45,6 +48,7 @@ def get_content(driver: WebDriver, param: str, level: int) -> str:
                 print("Button found")
                 break
             except:
+                not_found += 1
                 print("Button not found")
         try:
             button.click()
