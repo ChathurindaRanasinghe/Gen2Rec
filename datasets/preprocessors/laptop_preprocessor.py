@@ -2,9 +2,8 @@ import json
 from datetime import datetime
 
 
-def read_data():
-    json_file = "data/collected_data.json"
-    with open(json_file, 'r') as file:
+def read_data(json_file):
+    with open(json_file, "r") as file:
         return json.load(file)
 
 
@@ -66,14 +65,16 @@ def create_new_dataset(data):
     return new_dataset
 
 
-if __name__ == "__main__":
-    cleaned_data = remove_duplicates(read_data())
-    print("Cleaned dataset size: " + str(len(cleaned_data)))
-
-    processed_data = create_new_dataset(cleaned_data)
-    print("Processed dataset size: " + str(len(processed_data)))
-
-    with open("data/laptop_dataset.json", "w") as file:
+def save_to_file(output_file):
+    with open(output_file, "w") as file:
         json.dump(processed_data, file, indent=4)
+
+
+if __name__ == "__main__":
+    input_file = "data/collected_data.json"
+    output_file = "data/laptop_scraped.json"
+
+    cleaned_data = remove_duplicates(read_data())
+    processed_data = create_new_dataset(cleaned_data)
 
     print("JSON file has been successfully created.")
