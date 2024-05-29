@@ -65,7 +65,7 @@ def create_new_dataset(data):
     return new_dataset
 
 
-def save_to_file(output_file):
+def save_to_file(processed_data, output_file):
     with open(output_file, "w") as file:
         json.dump(processed_data, file, indent=4)
 
@@ -76,5 +76,6 @@ if __name__ == "__main__":
 
     cleaned_data = remove_duplicates(read_data(input_file))
     processed_data = create_new_dataset(cleaned_data)
+    save_to_file(processed_data, output_file)
 
     print("JSON file has been successfully created.")
