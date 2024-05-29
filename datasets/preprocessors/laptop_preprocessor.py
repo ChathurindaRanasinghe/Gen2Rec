@@ -74,7 +74,7 @@ if __name__ == "__main__":
     input_file = "data/collected_data.json"
     output_file = "data/laptop_dataset.json"
 
-    cleaned_data = remove_duplicates(read_data())
+    cleaned_data = remove_duplicates(read_data(input_file))
     processed_data = create_new_dataset(cleaned_data)
 
     print("JSON file has been successfully created.")
