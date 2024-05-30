@@ -11,7 +11,7 @@ def process_data(input_file):
         if entry is not None:
             flattened_entry = {
                 "name": entry.get("name", ""),
-                "price": entry.get("price", ""),
+                "price": entry.get("price", "").replace("$", "").replace(",", "").strip(),
                 "overview": ", ".join(entry.get("overview", [])),
                 "features": ", ".join(entry.get("features", [])),
                 "history": ", ".join(entry.get("history", [])),
