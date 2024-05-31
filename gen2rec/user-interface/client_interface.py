@@ -20,11 +20,11 @@ BACKEND_URL: str = "http://0.0.0.0:8000"
 
 
 def initialize(
-    recommendation_category: str,
-    dataset_file,
-    improve_dataset: bool,
-    system_prompt: str,
-    recommendation_fields,
+        recommendation_category: str,
+        dataset_file,
+        improve_dataset: bool,
+        system_prompt: str,
+        recommendation_fields,
 ) -> tuple:
     global CATEGORY
     global INITIALIZED
@@ -40,11 +40,11 @@ def initialize(
     elif recommendation_fields.isnull().values.any():
         status = "No recommendation fields provided"
     elif len(
-        [
-            element
-            for element in recommendation_fields["Type"].values
-            if element not in METADATA["AllowedTypes"]
-        ]
+            [
+                element
+                for element in recommendation_fields["Type"].values
+                if element not in METADATA["AllowedTypes"]
+            ]
     ):
         status = "Unallowed data type selected"
     else:
@@ -52,46 +52,14 @@ def initialize(
             CATEGORY = recommendation_category
             INITIALIZED = True
             FIELDS = recommendation_fields.columns.tolist()
-            print(recommendation_fields)
+            recommendation_fields.columns = [col.lower() for col in recommendation_fields.columns]
+            metadata_json: json = recommendation_fields.to_json(orient="records")
             body = {
                 "recommendation_category": recommendation_category,
                 # "dataset_file": dataset_file,
                 # "improve_dataset": improve_dataset,
                 "system_prompt": system_prompt,
-                "metadata_field_info": json.dumps(
-                    [
-                        {
-                            "name": "Category",
-                            "description": "Category of the book. One of ['Action  Adventure', 'Arts Film  Photography', 'Business  Economics', 'Childrens  Young Adult', 'Comics  Mangas', 'Computing Internet  Digital Media', 'Crafts Home  Lifestyle', 'Crime Thriller  Mystery', 'Engineering', 'Exam Preparation', 'Fantasy Horror  Science Fiction', 'Health Family  Personal Development', 'Health Fitness  Nutrition', 'History', 'Humour', 'Language Linguistics  Writing', 'Law', 'Literature  Fiction', 'Maps  Atlases', 'Medicine  Health Sciences', 'Politics', 'Reference', 'Religion', 'Romance', 'School Books', 'Science  Mathematics', 'Sciences Technology  Medicine', 'Society  Social Sciences', 'Sports', 'Textbooks  Study Guides', 'Travel']",
-                            "type": "string",
-                        },
-                        {
-                            "name": "Title",
-                            "description": "Title of the book.",
-                            "type": "string",
-                        },
-                        {
-                            "name": "Author",
-                            "description": "The name of the author.",
-                            "type": "string",
-                        },
-                        {
-                            "name": "Type",
-                            "description": "Type of the book. One of [e.g., Kindle Edition, Paperback].",
-                            "type": "string",
-                        },
-                        {
-                            "name": "Rating",
-                            "description": "Rating of the book out of 5 stars.",
-                            "type": "float",
-                        },
-                        {
-                            "name": "Price",
-                            "description": "Price of the book in USD dollars.",
-                            "type": "float",
-                        },
-                    ]
-                ),
+                "metadata_field_info": metadata_json,
                 "document_content_description": "Brief description about the book",
             }
             response = requests.post(
