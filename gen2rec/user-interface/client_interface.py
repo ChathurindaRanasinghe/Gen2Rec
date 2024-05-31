@@ -14,13 +14,18 @@ FIELDS: list = []
 METADATA: dict = {
     "Headings": ["Name", "Type", "Description"],
     "Datatypes": ["str", "str", "str"],
-    "AllowedTypes": ["int", "float", "str"]
+    "AllowedTypes": ["int", "float", "str"],
 }
-BACKEND_URL: str = "https://b8tbzq9k-8000.asse.devtunnels.ms"
+BACKEND_URL: str = "http://0.0.0.0:8000"
 
 
-def initialize(recommendation_category: str, dataset_file, improve_dataset: bool, system_prompt: str,
-               recommendation_fields) -> tuple:
+def initialize(
+    recommendation_category: str,
+    dataset_file,
+    improve_dataset: bool,
+    system_prompt: str,
+    recommendation_fields,
+) -> tuple:
     global CATEGORY
     global INITIALIZED
     global FIELDS
@@ -34,21 +39,65 @@ def initialize(recommendation_category: str, dataset_file, improve_dataset: bool
         status = "No system prompt provided"
     elif recommendation_fields.isnull().values.any():
         status = "No recommendation fields provided"
-    elif len([element for element in recommendation_fields["Type"].values if element not in METADATA["AllowedTypes"]]):
+    elif len(
+        [
+            element
+            for element in recommendation_fields["Type"].values
+            if element not in METADATA["AllowedTypes"]
+        ]
+    ):
         status = "Unallowed data type selected"
     else:
         try:
             CATEGORY = recommendation_category
             INITIALIZED = True
             FIELDS = recommendation_fields.columns.tolist()
+            print(recommendation_fields)
             body = {
                 "recommendation_category": recommendation_category,
-                "dataset_file": dataset_file,
-                "improve_dataset": improve_dataset,
+                # "dataset_file": dataset_file,
+                # "improve_dataset": improve_dataset,
                 "system_prompt": system_prompt,
-                "recommendation_fields": recommendation_fields
+                "metadata_field_info": json.dumps(
+                    [
+                        {
+                            "name": "Category",
+                            "description": "Category of the book. One of ['Action  Adventure', 'Arts Film  Photography', 'Business  Economics', 'Childrens  Young Adult', 'Comics  Mangas', 'Computing Internet  Digital Media', 'Crafts Home  Lifestyle', 'Crime Thriller  Mystery', 'Engineering', 'Exam Preparation', 'Fantasy Horror  Science Fiction', 'Health Family  Personal Development', 'Health Fitness  Nutrition', 'History', 'Humour', 'Language Linguistics  Writing', 'Law', 'Literature  Fiction', 'Maps  Atlases', 'Medicine  Health Sciences', 'Politics', 'Reference', 'Religion', 'Romance', 'School Books', 'Science  Mathematics', 'Sciences Technology  Medicine', 'Society  Social Sciences', 'Sports', 'Textbooks  Study Guides', 'Travel']",
+                            "type": "string",
+                        },
+                        {
+                            "name": "Title",
+                            "description": "Title of the book.",
+                            "type": "string",
+                        },
+                        {
+                            "name": "Author",
+                            "description": "The name of the author.",
+                            "type": "string",
+                        },
+                        {
+                            "name": "Type",
+                            "description": "Type of the book. One of [e.g., Kindle Edition, Paperback].",
+                            "type": "string",
+                        },
+                        {
+                            "name": "Rating",
+                            "description": "Rating of the book out of 5 stars.",
+                            "type": "float",
+                        },
+                        {
+                            "name": "Price",
+                            "description": "Price of the book in USD dollars.",
+                            "type": "float",
+                        },
+                    ]
+                ),
+                "document_content_description": "Brief description about the book",
             }
-            response = requests.post(BACKEND_URL + "/init", data=body)
+            response = requests.post(
+                BACKEND_URL + "/init",
+                data=body,
+            )
             if response.status_code == 200:
                 status = "Successfully initialized"
             else:
@@ -58,8 +107,12 @@ def initialize(recommendation_category: str, dataset_file, improve_dataset: bool
             print(e)
             status = "Issue occurred in initialization"
     INITIALIZED = True
-    return gr.update(interactive=INITIALIZED), gr.update(interactive=INITIALIZED), gr.update(
-        value=status), gr.update(value=f"# {TITLE} - {CATEGORY.capitalize()} Recommendation")
+    return (
+        gr.update(interactive=INITIALIZED),
+        gr.update(interactive=INITIALIZED),
+        gr.update(value=status),
+        gr.update(value=f"# {TITLE} - {CATEGORY.capitalize()} Recommendation"),
+    )
 
 
 def change_visibility(visible: list) -> tuple:
@@ -70,11 +123,11 @@ def change_visibility(visible: list) -> tuple:
 
 def submit_configurations(user_details: str, web_search: bool) -> dict:
     try:
-        body = {
-            "user_details": user_details,
-            "web_search": web_search
-        }
-        response = requests.post(BACKEND_URL + "/config", data=json.dumps(body))
+        body = {"user_details": user_details, "web_search": web_search}
+        response = requests.post(
+            BACKEND_URL + "/config",
+            data=json.dumps(body),
+        )
         if response.status_code == 200:
             status = "Configurations updated successfully"
         else:
@@ -88,12 +141,13 @@ def submit_configurations(user_details: str, web_search: bool) -> dict:
 
 def update_recommendations(number: int) -> dict:
     try:
-        body = {
-            "number": number
-        }
-        response = requests.get(BACKEND_URL + "/recommendations", params=body)
+        body = {"number": number}
+        response = requests.get(
+            BACKEND_URL + "/recommendations",
+            params=body,
+        )
         if response.status_code == 200:
-            recommendations = response.json()["answer"]
+            recommendations = response.json()
         else:
             print(response)
             recommendations = [{"metadata": "Error receiving response"}]
@@ -103,11 +157,11 @@ def update_recommendations(number: int) -> dict:
 
     recommendations_html = ""
     for rec in recommendations:
-        recommendations_html += f'''
+        recommendations_html += f"""
         <div class="card">
         {rec["metadata"]}
         </div>
-        '''
+        """
     return gr.update(value=recommendations_html)
 
 
@@ -115,9 +169,7 @@ def chat_response(message: str, history: list[str]) -> tuple[str, list]:
     history: list = history or []
     if message:
         try:
-            body = {
-                "query": message
-            }
+            body = {"query": message}
             response = requests.get(BACKEND_URL + "/chat", params=body)
             if response.status_code == 200:
                 history.append([message, response.json()["answer"]])
@@ -130,7 +182,7 @@ def chat_response(message: str, history: list[str]) -> tuple[str, list]:
     return "", history
 
 
-css: str = '''
+css: str = """
 footer {
     visibility: hidden
 }
@@ -141,7 +193,7 @@ footer {
     padding: 10px;
     border-radius:10px;
 }
-'''
+"""
 
 with gr.Blocks(css=css, title=TITLE) as demo:
     title_display = gr.Markdown(value=f"# {TITLE}")
@@ -149,42 +201,83 @@ with gr.Blocks(css=css, title=TITLE) as demo:
     with gr.Tabs():
         init_tab = gr.TabItem(label="Initialization")
         configuration_tab = gr.TabItem(label="Configurations", interactive=INITIALIZED)
-        recommendation_tab = gr.TabItem(label="Recommendations", interactive=INITIALIZED)
+        recommendation_tab = gr.TabItem(
+            label="Recommendations", interactive=INITIALIZED
+        )
 
         with init_tab:
             recommendation_category = gr.Textbox(label="Recommendation Category")
             with gr.Row():
                 dataset_file = gr.UploadButton(label="Upload dataset", type="binary")
-                improve_dataset = gr.Checkbox(label="Improve dataset with additional data")
+                improve_dataset = gr.Checkbox(
+                    label="Improve dataset with additional data"
+                )
             system_prompt = gr.Textbox(label="System prompt", lines=5)
-            recommendation_fields = gr.Dataframe(label="Metadata Fields", headers=METADATA["Headings"],
-                                                 datatype=METADATA["Datatypes"], col_count=(3, "fixed"))
+            recommendation_fields = gr.Dataframe(
+                label="Metadata Fields",
+                headers=METADATA["Headings"],
+                datatype=METADATA["Datatypes"],
+                col_count=(3, "fixed"),
+            )
             with gr.Row():
                 message = gr.Button(value="Initialize to continue", interactive=False)
                 init = gr.Button(value="Initialize")
-                init.click(fn=initialize, inputs=[recommendation_category, dataset_file, improve_dataset, system_prompt,
-                                                  recommendation_fields],
-                           outputs=[recommendation_tab, configuration_tab, message, title_display])
+                init.click(
+                    fn=initialize,
+                    inputs=[
+                        recommendation_category,
+                        dataset_file,
+                        improve_dataset,
+                        system_prompt,
+                        recommendation_fields,
+                    ],
+                    outputs=[
+                        recommendation_tab,
+                        configuration_tab,
+                        message,
+                        title_display,
+                    ],
+                )
 
         with recommendation_tab:
             with gr.Row():
                 with gr.Column(visible=True, variant="panel", scale=1) as list_column:
                     gr.Markdown(value="Recommendation List")
-                    number = gr.Slider(label="Number of recommendations", value=5, minimum=1, maximum=20, step=1)
+                    number = gr.Slider(
+                        label="Number of recommendations",
+                        value=5,
+                        minimum=1,
+                        maximum=20,
+                        step=1,
+                    )
                     refresh = gr.Button(value="Get Recommendations", size="sm")
                     recommendation_list = gr.HTML()
-                    refresh.click(fn=update_recommendations, inputs=number, outputs=recommendation_list)
+                    refresh.click(
+                        fn=update_recommendations,
+                        inputs=number,
+                        outputs=recommendation_list,
+                    )
 
                 with gr.Column(visible=True, scale=2) as chat_column:
                     gr.Markdown(value="Recommendation Chat Interface")
                     chatbot = gr.Chatbot()
                     message = gr.Textbox(show_label=False)
                     submit = gr.Button(value="Send")
-                    submit.click(fn=chat_response, inputs=[message, chatbot], outputs=[message, chatbot])
+                    submit.click(
+                        fn=chat_response,
+                        inputs=[message, chatbot],
+                        outputs=[message, chatbot],
+                    )
 
         with configuration_tab:
-            visible = gr.CheckboxGroup(choices=[LIST, CHAT], label="Visible recommendation options", value=[LIST, CHAT])
-            visible.change(fn=change_visibility, inputs=visible, outputs=[list_column, chat_column])
+            visible = gr.CheckboxGroup(
+                choices=[LIST, CHAT],
+                label="Visible recommendation options",
+                value=[LIST, CHAT],
+            )
+            visible.change(
+                fn=change_visibility, inputs=visible, outputs=[list_column, chat_column]
+            )
             gr.Markdown(value="<hr>")
             gr.Markdown(value="Recommendation System Configurations")
             user_details = gr.Textbox(label="User details", lines=5)
@@ -192,10 +285,18 @@ with gr.Blocks(css=css, title=TITLE) as demo:
             with gr.Row():
                 status = gr.Button(value="Set configurations", interactive=False)
                 submit = gr.Button(value="Submit")
-            submit.click(fn=submit_configurations, inputs=[user_details, web_search], outputs=status)
+            submit.click(
+                fn=submit_configurations,
+                inputs=[user_details, web_search],
+                outputs=status,
+            )
 
 if __name__ == "__main__":
-    parser: argparse.ArgumentParser = argparse.ArgumentParser(description="Launch Client Interface")
-    parser.add_argument("--server_port", type=int, default=8001, help="Port number to host the app")
+    parser: argparse.ArgumentParser = argparse.ArgumentParser(
+        description="Launch Client Interface"
+    )
+    parser.add_argument(
+        "--server_port", type=int, default=8001, help="Port number to host the app"
+    )
     args = parser.parse_args()
     demo.launch(server_port=args.server_port, show_api=False)
