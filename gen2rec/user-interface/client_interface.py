@@ -16,6 +16,9 @@ METADATA: dict = {
     "Datatypes": ["str", "str", "str"],
     "AllowedTypes": ["integer", "float", "string", "list", "date"],
 }
+SYSTEM_PROMPT: str = ""
+EMBEDDING_MODELS: list[str] = []
+LARGE_LANGUAGE_MODELS: list[str] = []
 BACKEND_URL: str = "https://b8tbzq9k-8002.asse.devtunnels.ms"
 
 
@@ -195,7 +198,6 @@ def run_client_interface(server_port: int) -> None:
             init_tab = gr.TabItem(label="Initialization")
             configuration_tab = gr.TabItem(label="Configurations", interactive=INITIALIZED)
             recommendation_tab = gr.TabItem(label="Recommendations", interactive=INITIALIZED)
-
             with init_tab:
                 recommendation_category = gr.Textbox(label="Recommendation Category")
                 dataset_file = gr.File(label="Upload dataset", type="binary", file_types=[".csv"])
@@ -233,7 +235,6 @@ def run_client_interface(server_port: int) -> None:
                             title_display,
                         ],
                     )
-
             with recommendation_tab:
                 with gr.Row():
                     with gr.Column(visible=True, variant="panel", scale=1) as list_column:
@@ -252,7 +253,6 @@ def run_client_interface(server_port: int) -> None:
                             inputs=number,
                             outputs=recommendation_list,
                         )
-
                     with gr.Column(visible=True, scale=2) as chat_column:
                         gr.Markdown(value="Recommendation Chat Interface")
                         chatbot = gr.Chatbot()
@@ -263,7 +263,6 @@ def run_client_interface(server_port: int) -> None:
                             inputs=[message, chatbot],
                             outputs=[message, chatbot],
                         )
-
             with configuration_tab:
                 visible = gr.CheckboxGroup(
                     choices=[LIST, CHAT],
@@ -288,12 +287,30 @@ def run_client_interface(server_port: int) -> None:
     demo.launch(server_port=server_port, show_api=False)
 
 
+def get_default_values():
+    global SYSTEM_PROMPT
+    global EMBEDDING_MODELS
+    global LARGE_LANGUAGE_MODELS
+    try:
+        response = requests.post(BACKEND_URL + "/default")
+        if response.status_code == 200:
+            SYSTEM_PROMPT = response.json()["system_prompt"]
+            EMBEDDING_MODELS = response.json()["embedding_models"]
+            LARGE_LANGUAGE_MODELS = response.json()["large_language_models"]
+            return True
+        else:
+            print(response)
+    except Exception as e:
+        print(e)
+    return False
+
+
 if __name__ == "__main__":
-    parser: argparse.ArgumentParser = argparse.ArgumentParser(
-        description="Launch Client Interface"
-    )
-    parser.add_argument(
-        "--server_port", type=int, default=8001, help="Port number to host the app"
-    )
+    parser: argparse.ArgumentParser = argparse.ArgumentParser(description="Launch Client Interface")
+    parser.add_argument("--server_port", type=int, default=8001, help="Port number to host the app")
     args = parser.parse_args()
-    run_client_interface(server_port=args.server_port)
+    pass_connection: bool = get_default_values()
+    if pass_connection:
+        run_client_interface(server_port=args.server_port)
+    else:
+        print("Backend connection failed")
