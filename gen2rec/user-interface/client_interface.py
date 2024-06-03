@@ -33,60 +33,53 @@ def update_fields(dataset_file) -> dict:
 def initialize(
         recommendation_category: str,
         dataset_file,
+        selected_fields: list[str],
         improve_dataset: bool,
         document_content_description: str,
-        selected_fields: list[str],
+        metadata_fields,
+        embedding_model: str,
         system_prompt: str,
-        recommendation_fields,
 ) -> tuple:
-    print(recommendation_fields)
     global CATEGORY
     global INITIALIZED
     global FIELDS
-    recommendation_fields = recommendation_fields.replace("", None)
+    metadata_fields = metadata_fields.replace("", None)
 
     status = "Initialization not completed"
     if not recommendation_category:
         status = "No recommendation category provided"
     elif not dataset_file:
         status = "No dataset file provided"
+    elif not selected_fields:
+        status = "No fields selected"
     elif not document_content_description:
         status = "No document content description provided"
+    elif metadata_fields.isnull().values.any():
+        status = "No recommendation fields provided"
+    elif not embedding_model:
+        status = "No embedding model selected"
     elif not system_prompt:
         status = "No system prompt provided"
-    elif recommendation_fields.isnull().values.any():
-        status = "No recommendation fields provided"
-    elif len(
-            [
-                element
-                for element in recommendation_fields["Name"].values
-                if element not in FIELDS
-            ]
-    ):
-        status = "Unavailable fields provided"
-    elif len(
-            [
-                element
-                for element in recommendation_fields["Type"].values
-                if element not in METADATA["AllowedTypes"]
-            ]
-    ):
-        status = "Unallowed data type selected"
+    elif any(element not in FIELDS for element in metadata_fields["Name"].values):
+        status = "Unavailable field provided in metadata"
+    elif any(element not in METADATA["AllowedTypes"] for element in metadata_fields["Type"].values):
+        status = "Unavailable data type provided in metadata"
     else:
-        print(selected_fields)
         try:
             CATEGORY = recommendation_category
             INITIALIZED = True
             FIELDS = selected_fields
-            recommendation_fields.columns = [col.lower() for col in recommendation_fields.columns]
-            metadata_json: json = recommendation_fields.to_json(orient="records")
+            metadata_fields.columns = [col.lower() for col in metadata_fields.columns]
+            metadata_json: json = metadata_fields.to_json(orient="records")
             body = {
                 "recommendation_category": recommendation_category.lower(),
                 "dataset_file": dataset_file,
+                "selected_fields": selected_fields,
                 "improve_dataset": improve_dataset,
-                "system_prompt": system_prompt,
-                "metadata_field_info": metadata_json,
                 "document_content_description": document_content_description,
+                "metadata_fields": metadata_json,
+                "embedding_model": embedding_model,
+                "system_prompt": system_prompt,
             }
             response = requests.post(
                 BACKEND_URL + "/init",
@@ -115,9 +108,12 @@ def change_visibility(visible: list) -> tuple:
     return gr.update(visible=VISIBILITY[LIST]), gr.update(visible=VISIBILITY[CHAT])
 
 
-def submit_configurations(user_details: str, web_search: bool) -> dict:
+def submit_configurations(large_language_model: str, user_details: str) -> dict:
     try:
-        body = {"user_details": user_details, "web_search": web_search}
+        body = {
+            "large_language_model": large_language_model,
+            "user_details": user_details
+        }
         response = requests.post(
             BACKEND_URL + "/config",
             data=json.dumps(body),
@@ -133,7 +129,7 @@ def submit_configurations(user_details: str, web_search: bool) -> dict:
     return gr.update(value=status)
 
 
-def update_recommendations(number: int) -> dict:
+def get_recommendations(number: int) -> dict:
     try:
         body = {"number": number}
         response = requests.get(
@@ -204,15 +200,16 @@ def run_client_interface(server_port: int) -> None:
                 selected_fields = gr.CheckboxGroup(label="Dataset Fields", interactive=True, visible=False)
                 improve_dataset = gr.Checkbox(label="Improve dataset with additional data")
                 document_content_description = gr.Textbox(label="Document Content Description", lines=2)
-                system_prompt = gr.Textbox(label="System Prompt", lines=5)
                 gr.Markdown("Metadata Fields")
-                recommendation_fields = gr.Dataframe(
+                metadata_fields = gr.Dataframe(
                     show_label=False,
                     headers=METADATA["Headings"],
                     datatype=METADATA["Datatypes"],
                     col_count=(3, "fixed"),
                     interactive=True
                 )
+                embedding_model = gr.Dropdown(label="Embedding Model", choices=EMBEDDING_MODELS)
+                system_prompt = gr.Textbox(label="System Prompt", value=SYSTEM_PROMPT, lines=5)
                 dataset_file.change(fn=update_fields, inputs=dataset_file, outputs=selected_fields)
                 with gr.Row():
                     message = gr.Button(value="Initialize to continue", interactive=False)
@@ -222,11 +219,12 @@ def run_client_interface(server_port: int) -> None:
                         inputs=[
                             recommendation_category,
                             dataset_file,
+                            selected_fields,
                             improve_dataset,
                             document_content_description,
-                            selected_fields,
+                            metadata_fields,
+                            embedding_model,
                             system_prompt,
-                            recommendation_fields,
                         ],
                         outputs=[
                             recommendation_tab,
@@ -249,7 +247,7 @@ def run_client_interface(server_port: int) -> None:
                         refresh = gr.Button(value="Get Recommendations", size="sm")
                         recommendation_list = gr.HTML()
                         refresh.click(
-                            fn=update_recommendations,
+                            fn=get_recommendations,
                             inputs=number,
                             outputs=recommendation_list,
                         )
@@ -274,14 +272,15 @@ def run_client_interface(server_port: int) -> None:
                 )
                 gr.Markdown(value="<hr>")
                 gr.Markdown(value="Recommendation System Configurations")
-                user_details = gr.Textbox(label="User details", lines=5)
-                web_search = gr.Checkbox(label="Enable web search", value=False)
+                large_language_model = gr.Dropdown(label="Large Language Model",
+                                                   choices=LARGE_LANGUAGE_MODELS)
+                user_details = gr.Textbox(label="User Details", lines=5)
                 with gr.Row():
                     status = gr.Button(value="Set configurations", interactive=False)
                     submit = gr.Button(value="Submit")
                 submit.click(
                     fn=submit_configurations,
-                    inputs=[user_details, web_search],
+                    inputs=[large_language_model, user_details],
                     outputs=status,
                 )
     demo.launch(server_port=server_port, show_api=False)
