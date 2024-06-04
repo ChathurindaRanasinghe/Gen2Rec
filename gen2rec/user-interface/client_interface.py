@@ -173,7 +173,11 @@ def chat_response(message: str, history: list[str]) -> tuple[str, list]:
     return "", history
 
 
-css: str = """
+css: str = """       
+.gradio-container {
+    max-width: none !important;
+}
+      
 footer {
     visibility: hidden
 }
