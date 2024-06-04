@@ -46,7 +46,7 @@ def metadata_to_json(metadata_fields) -> json:
 def initialize(
         recommendation_category: str,
         dataset_file,
-        selected_fields: list[str],
+        embedding_fields: list[str],
         improve_dataset: bool,
         document_content_description: str,
         metadata_fields: list,
@@ -61,7 +61,7 @@ def initialize(
         status = "No recommendation category provided"
     elif not dataset_file:
         status = "No dataset file provided"
-    elif not selected_fields:
+    elif not embedding_fields:
         status = "No fields selected"
     elif not document_content_description:
         status = "No document content description provided"
@@ -81,7 +81,7 @@ def initialize(
             body = {
                 "recommendation_category": recommendation_category.lower(),
                 "dataset_file": dataset_file,
-                "selected_fields": selected_fields,
+                "embedding_fields": embedding_fields,
                 "improve_dataset": improve_dataset,
                 "document_content_description": document_content_description,
                 "metadata_fields": metadata_fields,
@@ -96,7 +96,7 @@ def initialize(
                 status = "Successfully initialized"
                 INITIALIZED = True
                 CATEGORY = recommendation_category
-                FIELDS = selected_fields
+                FIELDS = embedding_fields
             else:
                 print(response)
                 status = "Issue occurred in initialization"
@@ -179,7 +179,7 @@ css: str = """
 }
       
 footer {
-    visibility: hidden
+    visibility: hidden;
 }
 """
 
@@ -195,7 +195,7 @@ def run_client_interface(server_port: int) -> None:
             with init_tab:
                 recommendation_category = gr.Textbox(label="Recommendation Category")
                 dataset_file = gr.File(label="Upload dataset", type="binary", file_types=[".csv"])
-                selected_fields = gr.CheckboxGroup(label="Dataset Fields", interactive=True, visible=False)
+                embedding_fields = gr.CheckboxGroup(label="Embedding Fields", interactive=True, visible=False)
                 improve_dataset = gr.Checkbox(label="Improve dataset with additional data")
                 document_content_description = gr.Textbox(label="Document Content Description", lines=2)
                 gr.Markdown("Metadata Fields")
@@ -219,7 +219,7 @@ def run_client_interface(server_port: int) -> None:
 
                 embedding_model = gr.Dropdown(label="Embedding Model", choices=EMBEDDING_MODELS)
                 system_prompt = gr.Textbox(label="System Prompt", value=SYSTEM_PROMPT, lines=5)
-                dataset_file.change(fn=update_fields, inputs=dataset_file, outputs=selected_fields)
+                dataset_file.change(fn=update_fields, inputs=dataset_file, outputs=embedding_fields)
                 with gr.Row():
                     message = gr.Button(value="Initialization not completed", interactive=False)
                     init = gr.Button(value="Initialize")
@@ -228,7 +228,7 @@ def run_client_interface(server_port: int) -> None:
                         inputs=[
                             recommendation_category,
                             dataset_file,
-                            selected_fields,
+                            embedding_fields,
                             improve_dataset,
                             document_content_description,
                             metadata_json,
@@ -262,7 +262,7 @@ def run_client_interface(server_port: int) -> None:
                         )
                     with gr.Column(visible=True, scale=3) as chat_column:
                         gr.Markdown(value="Recommendation Chat Interface")
-                        chatbot = gr.Chatbot()
+                        chatbot = gr.Chatbot(height=700)
                         message = gr.Textbox(show_label=False)
                         submit = gr.Button(value="Send")
                         submit.click(
@@ -273,7 +273,7 @@ def run_client_interface(server_port: int) -> None:
             with configuration_tab:
                 visible = gr.CheckboxGroup(
                     choices=[LIST, CHAT],
-                    label="Visible recommendation options",
+                    label="Visible Recommendation Options",
                     value=[LIST, CHAT],
                 )
                 visible.change(
@@ -300,7 +300,7 @@ def get_default_values():
     global EMBEDDING_MODELS
     global LARGE_LANGUAGE_MODELS
     try:
-        response = requests.post(BACKEND_URL + "/default")
+        response = requests.get(BACKEND_URL + "/default")
         if response.status_code == 200:
             SYSTEM_PROMPT = response.json()["system_prompt"]
             EMBEDDING_MODELS = response.json()["embedding_models"]
