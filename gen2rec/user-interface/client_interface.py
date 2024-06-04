@@ -149,19 +149,11 @@ def get_recommendations(number: int) -> dict:
             recommendations = response.json()
         else:
             print(response)
-            recommendations = [{"metadata": "Error receiving response"}]
+            recommendations = [{"Error": "Error receiving response"}]
     except Exception as e:
         print(e)
-        recommendations = [{"metadata": "Error receiving response"}]
-
-    recommendations_html = ""
-    for rec in recommendations:
-        recommendations_html += f"""
-        <div class="card">
-        {rec["metadata"]}
-        </div>
-        """
-    return gr.update(value=recommendations_html)
+        recommendations = [{"Error": "Error receiving response"}]
+    return gr.update(value=recommendations)
 
 
 def chat_response(message: str, history: list[str]) -> tuple[str, list]:
@@ -184,13 +176,6 @@ def chat_response(message: str, history: list[str]) -> tuple[str, list]:
 css: str = """
 footer {
     visibility: hidden
-}
-
-.card {
-    background-color: rgb(120,120,120);
-    margin: 10px;
-    padding: 10px;
-    border-radius:10px;
 }
 """
 
@@ -255,7 +240,7 @@ def run_client_interface(server_port: int) -> None:
                     )
             with recommendation_tab:
                 with gr.Row():
-                    with gr.Column(visible=True, variant="panel", scale=1) as list_column:
+                    with gr.Column(visible=True, variant="panel", scale=2) as list_column:
                         gr.Markdown(value="Recommendation List")
                         number = gr.Slider(
                             label="Number of recommendations",
@@ -265,13 +250,13 @@ def run_client_interface(server_port: int) -> None:
                             step=1,
                         )
                         refresh = gr.Button(value="Get Recommendations", size="sm")
-                        recommendation_list = gr.HTML()
+                        recommendation_list = gr.JSON()
                         refresh.click(
                             fn=get_recommendations,
                             inputs=number,
                             outputs=recommendation_list,
                         )
-                    with gr.Column(visible=True, scale=2) as chat_column:
+                    with gr.Column(visible=True, scale=3) as chat_column:
                         gr.Markdown(value="Recommendation Chat Interface")
                         chatbot = gr.Chatbot()
                         message = gr.Textbox(show_label=False)
