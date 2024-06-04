@@ -2,6 +2,7 @@ import argparse
 import json
 
 import gradio as gr
+import pandas
 import requests
 
 TITLE: str = "Gen2Rec"
@@ -30,22 +31,32 @@ def update_fields(dataset_file) -> dict:
     return gr.update(choices=FIELDS, value=FIELDS, visible=True)
 
 
+def metadata_to_json(metadata_fields) -> json:
+    try:
+        if type(metadata_fields) is pandas.DataFrame:
+            metadata_fields.columns = [col.lower() for col in metadata_fields.columns]
+            json_data = metadata_fields.to_json(orient="records")
+        else:
+            json_data = json.loads(metadata_fields)
+    except:
+        json_data = {"Error": "Invalid JSON provided"}
+    return gr.update(value=json_data)
+
+
 def initialize(
         recommendation_category: str,
         dataset_file,
         selected_fields: list[str],
         improve_dataset: bool,
         document_content_description: str,
-        metadata_fields,
+        metadata_fields: list,
         embedding_model: str,
         system_prompt: str,
 ) -> tuple:
     global CATEGORY
     global INITIALIZED
     global FIELDS
-    metadata_fields = metadata_fields.replace("", None)
 
-    status = "Initialization not completed"
     if not recommendation_category:
         status = "No recommendation category provided"
     elif not dataset_file:
@@ -54,30 +65,26 @@ def initialize(
         status = "No fields selected"
     elif not document_content_description:
         status = "No document content description provided"
-    elif metadata_fields.isnull().values.any():
-        status = "No recommendation fields provided"
+    elif (type(metadata_fields) is not list or
+          any(any(value == "" for value in item.values()) for item in metadata_fields)):
+        status = "No valid metadata fields provided"
+    elif any(set([item["name"] for item in metadata_fields]) - set(FIELDS)):
+        status = "Unavailable field provided in metadata"
+    elif any(set([item["type"] for item in metadata_fields]) - set(METADATA["AllowedTypes"])):
+        status = "Unavailable data type provided in metadata"
     elif not embedding_model:
         status = "No embedding model selected"
     elif not system_prompt:
         status = "No system prompt provided"
-    elif any(element not in FIELDS for element in metadata_fields["Name"].values):
-        status = "Unavailable field provided in metadata"
-    elif any(element not in METADATA["AllowedTypes"] for element in metadata_fields["Type"].values):
-        status = "Unavailable data type provided in metadata"
     else:
         try:
-            CATEGORY = recommendation_category
-            INITIALIZED = True
-            FIELDS = selected_fields
-            metadata_fields.columns = [col.lower() for col in metadata_fields.columns]
-            metadata_json: json = metadata_fields.to_json(orient="records")
             body = {
                 "recommendation_category": recommendation_category.lower(),
                 "dataset_file": dataset_file,
                 "selected_fields": selected_fields,
                 "improve_dataset": improve_dataset,
                 "document_content_description": document_content_description,
-                "metadata_fields": metadata_json,
+                "metadata_fields": metadata_fields,
                 "embedding_model": embedding_model,
                 "system_prompt": system_prompt,
             }
@@ -87,13 +94,15 @@ def initialize(
             )
             if response.status_code == 200:
                 status = "Successfully initialized"
+                INITIALIZED = True
+                CATEGORY = recommendation_category
+                FIELDS = selected_fields
             else:
                 print(response)
                 status = "Issue occurred in initialization"
         except Exception as e:
             print(e)
             status = "Issue occurred in initialization"
-    INITIALIZED = True
     return (
         gr.update(interactive=INITIALIZED),
         gr.update(interactive=INITIALIZED),
@@ -201,18 +210,29 @@ def run_client_interface(server_port: int) -> None:
                 improve_dataset = gr.Checkbox(label="Improve dataset with additional data")
                 document_content_description = gr.Textbox(label="Document Content Description", lines=2)
                 gr.Markdown("Metadata Fields")
-                metadata_fields = gr.Dataframe(
-                    show_label=False,
-                    headers=METADATA["Headings"],
-                    datatype=METADATA["Datatypes"],
-                    col_count=(3, "fixed"),
-                    interactive=True
-                )
+                with gr.Row():
+                    with gr.Column(scale=2):
+                        with gr.Tabs():
+                            with gr.TabItem(label="Form Data"):
+                                metadata_form_data = gr.Dataframe(
+                                    show_label=False,
+                                    headers=METADATA["Headings"],
+                                    datatype=METADATA["Datatypes"],
+                                    col_count=(3, "fixed"),
+                                    interactive=True
+                                )
+                            with gr.TabItem(label="JSON Data"):
+                                metadata_json_data = gr.Textbox(show_label=False, lines=4)
+                    with gr.Column(scale=1):
+                        metadata_json = gr.JSON(label="Metadata JSON")
+                metadata_form_data.change(fn=metadata_to_json, inputs=metadata_form_data, outputs=metadata_json)
+                metadata_json_data.change(fn=metadata_to_json, inputs=metadata_json_data, outputs=metadata_json)
+
                 embedding_model = gr.Dropdown(label="Embedding Model", choices=EMBEDDING_MODELS)
                 system_prompt = gr.Textbox(label="System Prompt", value=SYSTEM_PROMPT, lines=5)
                 dataset_file.change(fn=update_fields, inputs=dataset_file, outputs=selected_fields)
                 with gr.Row():
-                    message = gr.Button(value="Initialize to continue", interactive=False)
+                    message = gr.Button(value="Initialization not completed", interactive=False)
                     init = gr.Button(value="Initialize")
                     init.click(
                         fn=initialize,
@@ -222,7 +242,7 @@ def run_client_interface(server_port: int) -> None:
                             selected_fields,
                             improve_dataset,
                             document_content_description,
-                            metadata_fields,
+                            metadata_json,
                             embedding_model,
                             system_prompt,
                         ],
