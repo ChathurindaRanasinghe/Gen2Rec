@@ -1,5 +1,6 @@
 import argparse
 import json
+from time import sleep
 
 import gradio as gr
 import pandas
@@ -93,10 +94,18 @@ def initialize(
                 data=body,
             )
             if response.status_code == 200:
-                status = "Successfully initialized"
-                INITIALIZED = True
-                CATEGORY = recommendation_category
-                FIELDS = embedding_fields
+                while True:
+                    sleep(5)
+                    init_status = requests.get(BACKEND_URL + "/init-status")
+                    if init_status == 200:
+                        INITIALIZED = True
+                        CATEGORY = recommendation_category
+                        FIELDS = embedding_fields
+                        status = "Successfully initialized"
+                        break
+                    elif init_status != 102:
+                        status = "Issue occurred in initialization"
+                        break
             else:
                 print(response)
                 status = "Issue occurred in initialization"
