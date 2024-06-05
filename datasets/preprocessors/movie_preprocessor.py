@@ -1,6 +1,6 @@
 import csv
-import json
 
+import pandas as pd
 import requests
 
 
@@ -36,7 +36,7 @@ def parse_specific_fields(data):
         return None
 
 
-def fetch_data():
+def fetch_data(movies):
     api_key = ""
     api_url = f"http://www.omdbapi.com/?apikey={api_key}&t="
 
@@ -52,21 +52,62 @@ def fetch_data():
     return dataset
 
 
-def save_data_to_json(data, filename):
-    try:
-        with open(filename, "w") as json_file:
-            json.dump(data, json_file, indent=4)
-        print(f"Data successfully saved to {filename}")
-    except IOError as e:
-        print(f"Error saving data to JSON file: {e}")
+def flatten_and_clean_data(data):
+    fields_to_remove = ["Type","DVD","Production", "Website"]
+    flat_data = []
+    for item in data:
+        flat_item = {
+            "Title": item.get("Title"),
+            "Year": item.get("Year"),
+            "Rated": item.get("Rated"),
+            "Released": item.get("Released"),
+            "Runtime": item.get("Runtime"),
+            "Genre": item.get("Genre"),
+            "Director": item.get("Director"),
+            "Writer": item.get("Writer"),
+            "Actors": item.get("Actors"),
+            "Plot": item.get("Plot"),
+            "Language": item.get("Language"),
+            "Country": item.get("Country"),
+            "Awards": item.get("Awards"),
+            "Poster": item.get("Poster"),
+            "Metascore": item.get("Metascore"),
+            "imdbRating": item.get("imdbRating"),
+            "imdbVotes": item.get("imdbVotes"),
+            "imdbID": item.get("imdbID"),
+            "Type": item.get("Type"),
+            "DVD": item.get("DVD"),
+            "BoxOffice": item.get("BoxOffice"),
+            "Production": item.get("Production"),
+            "Website": item.get("Website"),
+        }
+        if "Ratings" in item:
+            for rating in item["Ratings"]:
+                source = rating.get("Source")
+                value = rating.get("Value")
+                if source and value:
+                    flat_item[f"Rating_{source}"] = value
+
+        for field in fields_to_remove:
+            if field in flat_item:
+                del flat_item[field]
+
+        flat_data.append(flat_item)
+    return flat_data
+
+
+def save_to_csv(data, output_file):
+    df = pd.DataFrame(data)
+    df.to_csv(output_file, index=False)
 
 
 if __name__ == "__main__":
     input_file = "data/movies.csv"
-    output_file = "data/movie_dataset.json"
+    output_file = "data/movie_dataset.csv"
 
     movies = get_data(input_file)
-    dataset = fetch_data()
-    save_data_to_json(dataset, output_file)
+    dataset = fetch_data(movies)
+    cleaned_data = flatten_and_clean_data(dataset)
+    save_to_csv(cleaned_data, output_file)
 
-    print("JSON file has been successfully created.")
+    print("CSV file has been successfully created.")
