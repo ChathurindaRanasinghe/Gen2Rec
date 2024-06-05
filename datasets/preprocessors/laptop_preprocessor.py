@@ -1,6 +1,8 @@
 import json
 from datetime import datetime
 
+import pandas as pd
+
 
 def read_data(json_file):
     with open(json_file, "r") as file:
@@ -65,17 +67,22 @@ def create_new_dataset(data):
     return new_dataset
 
 
+def flatten_data(y):
+    out = pd.json_normalize(data=y, sep="_", max_level=1)
+    return out
+
+
 def save_to_file(processed_data, output_file):
-    with open(output_file, "w") as file:
-        json.dump(processed_data, file, indent=4)
+    processed_data.to_csv(output_file, sep=',', encoding='utf-8')
 
 
 if __name__ == "__main__":
     input_file = "data/collected_data.json"
-    output_file = "data/laptop_dataset.json"
+    output_file = "data/laptop_dataset.csv"
 
     cleaned_data = remove_duplicates(read_data(input_file))
     processed_data = create_new_dataset(cleaned_data)
-    save_to_file(processed_data, output_file)
+    flatten_data = flatten_data(processed_data)
+    save_to_file(flatten_data, output_file)
 
-    print("JSON file has been successfully created.")
+    print("CSV file has been successfully created.")
