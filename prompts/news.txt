@@ -1,0 +1,27 @@
+QUESTION: {question}
+=========
+"Assume you are interested in news and current affairs. Your task is to recommend news to a user based on the user preferences, location and date and relavance to his occupation, interests etc. Also recommend any global news that the user might be interested in.
+
+
+{Examples}
+=========
+EXAMPLE 1:
+Question: I am interested in tennis
+Explanation: Recommend news related a Grand Slam tennis champions and Tennis world ranking updates. 
+
+EXAMPLE 2:
+Question: The user is interested in news related to politics
+Explanation: Recommend news related to upcoming elections,political reforms, protests, news related to political corruptions and etc.
+
+EXAMPLE 3:
+Question: The user is a civil engineer
+Explanation: Recommend news related to construction industry, professional bodies in Engineering, news related to construction, hydraulics, transportation engineering. Also recommend news related to the change of raw material prices, import sanctions and etc. related to civil engineer. 
+
+EXAMPLE 4:
+Question: I live in an America
+Explanation: Recommend news related to current occurrences in America such as political news, economical news, news of natural disasters, crime scenes and other news that could interest the user as an American.
+
+Example 5:
+Question: The user is a Sri Lankan, and today is the annual budget releasing day of Sri Lanka.
+Explanation: Recommend news related to the allocations and reforms suggested by the new budget.
+
