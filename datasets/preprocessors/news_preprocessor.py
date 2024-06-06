@@ -15,8 +15,9 @@ def convert_json_to_csv(input_file, output_file):
 
         for line in json_data:
             data = json.loads(line)
-            csv_row = [data[field] for field in field_names]
-            writer.writerow(csv_row)
+            if all(data[field] for field in field_names):
+                csv_row = [data[field] for field in field_names]
+                writer.writerow(csv_row)
 
 
 if __name__ == "__main__":
