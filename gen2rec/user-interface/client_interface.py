@@ -96,21 +96,16 @@ def initialize(
             )
             if response.status_code == 200:
                 while True:
-                    sleep(10)
-                    print("here")
+                    sleep(5)
                     init_status = requests.get(BACKEND_URL + "/init-status")
-                    print("status: " + str(init_status.status_code))
                     if init_status.status_code == 200:
-                        print("here1")
                         INITIALIZED = True
                         CATEGORY = recommendation_category
                         FIELDS = embedding_fields
                         status = "Successfully initialized"
                     elif init_status.status_code == 201:
-                        print("here2")
                         status = "Initialization in progress"
                         continue
-                    print("breaking")
                     break
             else:
                 print(response)
