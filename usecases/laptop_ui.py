@@ -1,4 +1,5 @@
 import json
+import time
 
 import requests
 import streamlit as st
@@ -119,12 +120,25 @@ def chat_interface() -> None:
         st.chat_message("user").markdown(prompt)
         st.session_state.messages.append({"role": "user", "content": prompt})
 
-        with st.spinner(text="Please wait"):
-            response = get_chat() #requests.get(BACKEND_URL+"/chat", params={"query": prompt}).json()
-            response = response["answer"]
-            with st.chat_message("assistant"):
-                st.markdown(response)
-            st.session_state.messages.append({"role": "assistant", "content": response})
+        response = get_chat()  # Mocked function to get chat response
+        response_dict = response
+        answer = response_dict["answer"]
+
+        # Display user message
+        st.session_state.messages.append({"role": "user", "content": prompt})
+        st.chat_message("user").markdown(prompt)
+
+        # Simulate streaming assistant response
+        assistant_response = ""
+        message_placeholder = st.empty()
+
+        for chunk in answer.split():
+            assistant_response += chunk + " "
+            with message_placeholder:
+                st.chat_message("assistant").markdown(assistant_response)
+            time.sleep(0.1)  # Simulate delay for streaming effect
+
+        st.session_state.messages.append({"role": "assistant", "content": assistant_response})
 
 
 if __name__ == "__main__":
