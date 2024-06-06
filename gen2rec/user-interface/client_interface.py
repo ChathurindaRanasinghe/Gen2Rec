@@ -206,7 +206,7 @@ def run_client_interface(server_port: int) -> None:
                 recommendation_category = gr.Textbox(label="Recommendation Category")
                 dataset_file = gr.File(label="Upload dataset", type="binary", file_types=[".csv"])
                 embedding_fields = gr.CheckboxGroup(label="Embedding Fields", interactive=True, visible=False)
-                improve_dataset = gr.Checkbox(label="Improve dataset with additional data")
+                improve_dataset = gr.Checkbox(label="Improve dataset with additional descriptions")
                 document_content_description = gr.Textbox(label="Document Content Description", lines=2)
                 gr.Markdown("Metadata Fields")
                 with gr.Row():
