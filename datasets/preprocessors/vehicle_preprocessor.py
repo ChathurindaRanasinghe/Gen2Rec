@@ -1,5 +1,6 @@
-import csv
 import json
+
+import pandas as pd
 
 
 def process_data(input_file):
@@ -12,24 +13,44 @@ def process_data(input_file):
             flattened_entry = {
                 "name": entry.get("name", ""),
                 "price": entry.get("price", "").replace("$", "").replace(",", "").strip(),
-                "overview": ", ".join(entry.get("overview", [])),
                 "features": ", ".join(entry.get("features", [])),
                 "history": ", ".join(entry.get("history", [])),
                 "seller_notes": entry.get("seller_notes", ""),
                 "seller": entry.get("seller", ""),
                 "review": entry.get("review", "")
             }
+
+            overview_mapping = {
+                "mileage": "",
+                "doors": "",
+                "transmission": "",
+                "engine": "",
+                "drivetrain": ""
+            }
+            for item in entry.get("overview", []):
+                if "miles" in item.lower():
+                    overview_mapping["mileage"] = item.replace("miles", "").replace(",", "").strip()
+                elif "doors" in item.lower():
+                    overview_mapping["doors"] = item.replace("Doors", "").strip()
+                elif "transmission" in item.lower():
+                    overview_mapping["transmission"] = item
+                elif "cylinder" in item.lower():
+                    overview_mapping["engine"] = item
+                elif "drive" in item.lower():
+                    overview_mapping["drivetrain"] = item
+
+            if len(entry.get("overview", [])) > 6:
+                overview_mapping["interior_color"] = entry.get("overview", [])[1]
+                overview_mapping["exterior_color"] = entry.get("overview", [])[2]
+
+            flattened_entry.update(overview_mapping)
             flattened_data.append(flattened_entry)
     return flattened_data
 
 
 def save_to_csv(flattened_data, output_file):
-    csv_columns = ["name", "price", "overview", "features", "history", "seller_notes", "seller", "review"]
-    with open(output_file, mode='w', newline='', encoding='utf-8') as file:
-        writer = csv.DictWriter(file, fieldnames=csv_columns)
-        writer.writeheader()
-        for data in flattened_data:
-            writer.writerow(data)
+    df = pd.DataFrame(flattened_data)
+    df.to_csv(output_file, index=False)
 
 
 if __name__ == "__main__":
