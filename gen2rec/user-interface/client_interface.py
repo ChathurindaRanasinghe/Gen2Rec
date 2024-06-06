@@ -21,7 +21,7 @@ METADATA: dict = {
 SYSTEM_PROMPT: str = ""
 EMBEDDING_MODELS: list[str] = []
 LARGE_LANGUAGE_MODELS: list[str] = []
-BACKEND_URL: str = "https://b8tbzq9k-8002.asse.devtunnels.ms"
+BACKEND_URL: str = "https://b8tbzq9k-8000.asse.devtunnels.ms"
 
 
 def update_fields(dataset_file) -> dict:
@@ -32,7 +32,7 @@ def update_fields(dataset_file) -> dict:
     return gr.update(choices=FIELDS, value=FIELDS, visible=True)
 
 
-def metadata_to_json(metadata_fields) -> json:
+def metadata_to_json(metadata_fields) -> dict:
     try:
         if type(metadata_fields) is pandas.DataFrame:
             metadata_fields.columns = [col.lower() for col in metadata_fields.columns]
@@ -58,6 +58,7 @@ def initialize(
     global INITIALIZED
     global FIELDS
 
+    status = "Initialization not completed"
     if not recommendation_category:
         status = "No recommendation category provided"
     elif not dataset_file:
@@ -85,7 +86,7 @@ def initialize(
                 "embedding_fields": embedding_fields,
                 "improve_dataset": improve_dataset,
                 "document_content_description": document_content_description,
-                "metadata_fields": metadata_fields,
+                "metadata_fields": json.dumps(metadata_fields),
                 "embedding_model": embedding_model,
                 "system_prompt": system_prompt,
             }
@@ -95,17 +96,22 @@ def initialize(
             )
             if response.status_code == 200:
                 while True:
-                    sleep(5)
+                    sleep(10)
+                    print("here")
                     init_status = requests.get(BACKEND_URL + "/init-status")
-                    if init_status == 200:
+                    print("status: " + str(init_status.status_code))
+                    if init_status.status_code == 200:
+                        print("here1")
                         INITIALIZED = True
                         CATEGORY = recommendation_category
                         FIELDS = embedding_fields
                         status = "Successfully initialized"
-                        break
-                    elif init_status != 102:
-                        status = "Issue occurred in initialization"
-                        break
+                    elif init_status.status_code == 201:
+                        print("here2")
+                        status = "Initialization in progress"
+                        continue
+                    print("breaking")
+                    break
             else:
                 print(response)
                 status = "Issue occurred in initialization"
@@ -313,7 +319,7 @@ def get_default_values():
         if response.status_code == 200:
             SYSTEM_PROMPT = response.json()["system_prompt"]
             EMBEDDING_MODELS = response.json()["embedding_models"]
-            LARGE_LANGUAGE_MODELS = response.json()["large_language_models"]
+            LARGE_LANGUAGE_MODELS = response.json()["llms"]
             return True
         else:
             print(response)
