@@ -126,11 +126,12 @@ def change_visibility(visible: list) -> tuple:
     return gr.update(visible=VISIBILITY[LIST]), gr.update(visible=VISIBILITY[CHAT])
 
 
-def submit_configurations(large_language_model: str, user_details: str) -> dict:
+def submit_configurations(large_language_model: str, user_details: str, enable_evaluation: bool) -> dict:
     try:
         body = {
             "large_language_model": large_language_model,
-            "user_details": user_details
+            "user_details": user_details,
+            "enable_evaluation": enable_evaluation
         }
         response = requests.post(
             BACKEND_URL + "/config",
@@ -293,12 +294,13 @@ def run_client_interface(server_port: int) -> None:
                 large_language_model = gr.Dropdown(label="Large Language Model",
                                                    choices=LARGE_LANGUAGE_MODELS)
                 user_details = gr.Textbox(label="User Details", lines=5)
+                enable_evaluation = gr.Checkbox(label="Enable Evaluation")
                 with gr.Row():
                     status = gr.Button(value="Set configurations", interactive=False)
                     submit = gr.Button(value="Submit")
                 submit.click(
                     fn=submit_configurations,
-                    inputs=[large_language_model, user_details],
+                    inputs=[large_language_model, user_details, enable_evaluation],
                     outputs=status,
                 )
     demo.launch(server_port=server_port, show_api=False)
@@ -324,7 +326,7 @@ if __name__ == "__main__":
     parser: argparse.ArgumentParser = argparse.ArgumentParser(description="Launch Client Interface")
     parser.add_argument("--server_port", type=int, default=8001, help="Port number to host the app")
     args = parser.parse_args()
-    pass_connection: bool = True  # get_default_values()
+    pass_connection: bool = get_default_values()
     if pass_connection:
         run_client_interface(server_port=args.server_port)
     else:
