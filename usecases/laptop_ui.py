@@ -53,21 +53,28 @@ def recommendation_interface(recs):
 
 
 def chat_interface() -> None:
-    if "messages" not in st.session_state:
-        st.session_state["messages"] = []
+    with st.container(height=500):
+        if "messages" not in st.session_state:
+            st.session_state["messages"] = []
 
-    if prompt := st.chat_input("Ask for a Laptop recommendation"):
-        st.chat_message("user").markdown(prompt)
-        st.session_state.messages.append({"role": "user", "content": prompt})
-        response = ""
-        message_placeholder = st.empty()
-        with requests.get(BACKEND_URL + "/chat-stream", stream=True) as r:
-            for chunk in r.iter_content():
-                if chunk:
-                    response += chunk.decode('utf-8')
-                with message_placeholder:
-                    st.chat_message("assistant").markdown(response)
-        st.session_state.messages.append({"role": "assistant", "content": response})
+        if prompt := st.chat_input("Ask for a Laptop recommendation"):
+            st.session_state.messages.append({"role": "user", "content": prompt})
+            response = ""
+            message_placeholder = st.empty()
+            print(st.session_state.messages)
+            with requests.get(
+                    BACKEND_URL + "/chat-stream",
+                    params=st.session_state.messages,
+                    stream=True
+            ) as r:
+                for chunk in r.iter_content():
+                    if chunk:
+                        response += chunk.decode('utf-8')
+                    with message_placeholder:
+                        st.chat_message("assistant").markdown(response)
+            st.session_state.messages.append({"role": "assistant", "content": response})
+            for message in reversed(st.session_state.messages[:-1]):
+                st.chat_message(message["role"]).markdown(message["content"])
 
 
 if __name__ == "__main__":
