@@ -2,7 +2,7 @@ import requests
 import streamlit as st
 from streamlit_card import card
 
-BACKEND_URL: str = "https://b8tbzq9k-8008.asse.devtunnels.ms"
+BACKEND_URL: str = "http://127.0.0.1:8000"
 
 
 def get_recs(number):
@@ -18,30 +18,11 @@ def get_recs(number):
     return response.json()
 
 
-# def get_chat():
-#     return json.loads("""{
-#       "input": "I am interested in action movies can you recommend me 5 moviees",
-#       "chat_history": [
-#         {
-#           "content": "I am interested in action movies can you recommend me 5 moviees",
-#           "additional_kwargs": {},
-#           "response_metadata": {},
-#           "type": "human",
-#           "name": null,
-#           "id": null,
-#           "example": false
-#         },
-#         "Based on your interest in action movies, here are the recommendations from the given set of movies:\\n\\n1. **The Terminator (1984)**\\n   - **Description:** A relentless cyborg assassin is sent from the future to kill a woman whose unborn son is destined to save humanity from extinction. A human soldier is also sent back to protect her.\\n   - **Rating:** 3.90\\n   - **Genres:** Action, Sci-Fi, Thriller\\n\\n2. **Tron: Legacy (2010)**\\n   - **Description:** The son of a virtual world designer goes looking for his father and ends up inside the digital world that his father designed. He meets his father's corrupted creation and a unique ally who was born inside the digital world.\\n   - **Rating:** 3.24\\n   - **Genres:** Action, Adventure, Sci-Fi, IMAX\\n\\nUnfortunately, I can only recommend 2 action movies from the given set. The other movies do not fall under the action genre."
-#       ],
-#       "answer": "Based on your interest in action movies, here are the recommendations from the given set of movies:\\n\\n1. **The Terminator (1984)**\\n   - **Description:** A relentless cyborg assassin is sent from the future to kill a woman whose unborn son is destined to save humanity from extinction. A human soldier is also sent back to protect her.\\n   - **Rating:** 3.90\\n   - **Genres:** Action, Sci-Fi, Thriller\\n\\n2. **Tron: Legacy (2010)**\\n   - **Description:** The son of a virtual world designer goes looking for his father and ends up inside the digital world that his father designed. He meets his father's corrupted creation and a unique ally who was born inside the digital world.\\n   - **Rating:** 3.24\\n   - **Genres:** Action, Adventure, Sci-Fi, IMAX\\n\\nUnfortunately, I can only recommend 2 action movies from the given set. The other movies do not fall under the action genre."
-#     }""")
-
-
 def recommendation_interface(recs):
     def card_ui(data):
         return card(
-            key=data["movie"],
-            title=data["movie"] + " " + data["year"],
+            key=data["name"],
+            title=data["name"],
             text=data["genres"] + " | " + str(data["average_rating"]),
             image=data["thumbnail"],
             styles={
@@ -74,39 +55,21 @@ def recommendation_interface(recs):
 def chat_interface() -> None:
     if "messages" not in st.session_state:
         st.session_state["messages"] = []
-
-    for message in st.session_state.messages:
-        with st.chat_message(message["role"]):
-            st.markdown(message["content"])
-
+    # for message in st.session_state.messages:
+    #     with st.chat_message(message["role"]):
+    #         st.markdown(message["content"])
     if prompt := st.chat_input("Ask for a Laptop recommendation"):
         st.chat_message("user").markdown(prompt)
         st.session_state.messages.append({"role": "user", "content": prompt})
-
-        # response = get_chat()  # Mocked function to get chat response
-        # response_dict = response
-        # answer = response_dict["answer"]
-
-        # Display user message
-        # st.session_state.messages.append({"role": "user", "content": prompt})
-        # st.chat_message("user").markdown(prompt)
-
-        # Simulate streaming assistant response
-        assistant_response = ""
+        response = ""
         message_placeholder = st.empty()
-
-        with requests.get(
-                url=BACKEND_URL + "/chat-stream", stream=True, params={"query": prompt}
-        ) as r:
+        with requests.get(BACKEND_URL + "/query-stream", stream=True) as r:
             for chunk in r.iter_content():
-                print(chunk)
-                assistant_response += chunk + " "
+                if chunk:
+                    response += chunk.decode('utf-8')
                 with message_placeholder:
-                    st.chat_message("assistant").markdown(assistant_response)
-
-        st.session_state.messages.append(
-            {"role": "assistant", "content": assistant_response}
-        )
+                    st.chat_message("assistant").markdown(response)
+        st.session_state.messages.append({"role": "assistant", "content": response})
 
 
 if __name__ == "__main__":
