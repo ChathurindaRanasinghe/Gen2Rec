@@ -1,0 +1,9 @@
+langchain
+langchain-community
+langchain-qdrant
+langchain-voyageai
+langchain-openai
+fastapi
+lark
+loguru
+jinja2
