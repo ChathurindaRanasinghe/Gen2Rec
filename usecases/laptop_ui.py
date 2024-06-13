@@ -55,15 +55,13 @@ def recommendation_interface(recs):
 def chat_interface() -> None:
     if "messages" not in st.session_state:
         st.session_state["messages"] = []
-    # for message in st.session_state.messages:
-    #     with st.chat_message(message["role"]):
-    #         st.markdown(message["content"])
+
     if prompt := st.chat_input("Ask for a Laptop recommendation"):
         st.chat_message("user").markdown(prompt)
         st.session_state.messages.append({"role": "user", "content": prompt})
         response = ""
         message_placeholder = st.empty()
-        with requests.get(BACKEND_URL + "/query-stream", stream=True) as r:
+        with requests.get(BACKEND_URL + "/chat-stream", stream=True) as r:
             for chunk in r.iter_content():
                 if chunk:
                     response += chunk.decode('utf-8')
@@ -74,7 +72,7 @@ def chat_interface() -> None:
 
 if __name__ == "__main__":
     st.set_page_config(layout="wide")
-    st.title("Laptop Shop")
+    st.title("Laptop Arcade")
     col1, col2 = st.columns([2, 1])
     with col1:
         recommendation_interface(get_recs(4))
