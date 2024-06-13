@@ -21,7 +21,7 @@ async def get_default_config() -> DefaultConfig:
 
 @app.get("/chat-stream")
 async def chat_stream(query: str):
-    raise NotImplementedError()
+    raise NotImplementedError("Streaming not supported")
 
 
 @app.get("/chat")
