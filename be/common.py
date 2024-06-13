@@ -3,7 +3,6 @@ import inspect
 
 class ConstantGroup:
     def __iter__(self):
-        print("__iter__")
         for name, cls in vars(self.__class__).items():
             if inspect.isclass(cls):
                 for const_name, const_value in vars(cls).items():

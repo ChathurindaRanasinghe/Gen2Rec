@@ -14,3 +14,4 @@ qdrant_storage
 redis-local-data
 *.rdb
 demo-*.yaml
+persistent-embeddings
