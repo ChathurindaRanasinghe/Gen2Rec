@@ -275,7 +275,7 @@ class RecommendationEngine:
         )
         self.recommendation_pipeline.stream()
         if not recommendation_only:
-            self._chat_history.extend([HumanMessage(content=query), output["answer"]])
+            self.chat_history.extend([HumanMessage(content=query), output["answer"]])
             return output
         else:
             return output["context"]
