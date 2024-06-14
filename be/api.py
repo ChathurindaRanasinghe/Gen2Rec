@@ -1,4 +1,5 @@
 import json
+from contextlib import asynccontextmanager
 from pathlib import Path
 from time import perf_counter
 
@@ -13,14 +14,18 @@ from .engine import RecommendationEngine
 from .log import logger
 from .schemas import DefaultConfig
 
-app = FastAPI(title="Gen2Rec")
+
 recommendation_engine = None
 
 
-@app.on_event("startup")
-async def startup_event():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
     global recommendation_engine
     recommendation_engine = RecommendationEngine()
+    yield
+
+
+app = FastAPI(title="Gen2Rec", lifespan=lifespan)
 
 
 @app.get("/default")
