@@ -8,6 +8,7 @@ from langchain.chains.history_aware_retriever import create_history_aware_retrie
 from langchain.chains.query_constructor.base import AttributeInfo
 from langchain.chains.retrieval import create_retrieval_chain
 from langchain.retrievers.self_query.base import SelfQueryRetriever
+from langchain_community.chat_models import ChatOllama
 from langchain_community.document_loaders.helpers import detect_file_encodings
 from langchain_community.vectorstores import Qdrant
 from langchain_core.documents.base import Document
@@ -15,14 +16,16 @@ from langchain_core.embeddings import Embeddings
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.messages import HumanMessage
 from langchain_core.output_parsers import StrOutputParser
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.prompts import MessagesPlaceholder
 from langchain_core.runnables import RunnablePassthrough
-from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+from langchain_openai import ChatOpenAI
+from langchain_openai import OpenAIEmbeddings
 from langchain_voyageai import VoyageAIEmbeddings
-from langchain_community.chat_models import ChatOllama
-from loguru import logger
 
-from .common import EmbeddingModels, LargeLanguageModels
+from .common import EmbeddingModels
+from .common import LargeLanguageModels
+from .log import logger
 from .utility import process_template
 
 load_dotenv(".env")
@@ -38,9 +41,11 @@ class RecommendationEngine:
             self._llm = ChatOllama(model=LargeLanguageModels.MetaAI.LLAMA_3_70B)
             logger.info(self._llm)
         else:
+            logger.info("Setting default language model: gpt-4o")
             self._llm = ChatOpenAI(
                 model=LargeLanguageModels.OpenAI.GPT_4O, verbose=False, temperature=0
             )
+            logger.info(self._llm)
         self._document_content_description = None
         self._vectorstore = None
         self._embeddings_available = os.environ.get("EMBEDDINGS_GENERATED") == "1"
@@ -279,20 +284,20 @@ class RecommendationEngine:
     def chat_history(self):
         return self._chat_history
 
-    def run_recommendation_system(
+    async def run_recommendation_system(
         self, query: str, recommendation_only: bool = False, stream: bool = False
     ):
         logger.info(f"Running recommendation system for query: {query}")
-        output = self.recommendation_pipeline.invoke(
+        output = await self.recommendation_pipeline.ainvoke(
             {"input": query, "chat_history": self.chat_history}
         )
         # self.recommendation_pipeline.stream()
         self.chat_history.extend([HumanMessage(content=query), output["answer"]])
         return output
 
-    def run_recommendation_system_stream(self, query: str):
+    async def run_recommendation_system_stream(self, query: str):
         logger.info(f"Running (stream) recommendation system for query: {query}")
-        for chunk in self.recommendation_pipeline.stream(
+        async for chunk in self.recommendation_pipeline.astream(
             {"input": query, "chat_history": []}
         ):
             logger.info(f"Chunk: {chunk}")

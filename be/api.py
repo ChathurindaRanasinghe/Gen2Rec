@@ -1,20 +1,27 @@
 import json
 from pathlib import Path
+from time import perf_counter
 
-from fastapi import BackgroundTasks, FastAPI, Request, Response, status
+from fastapi import BackgroundTasks
+from fastapi import FastAPI
+from fastapi import Request
+from fastapi import Response
+from fastapi import status
 from fastapi.responses import StreamingResponse
-from loguru import logger
 
 from .engine import RecommendationEngine
+from .log import logger
 from .schemas import DefaultConfig
 
 app = FastAPI(title="Gen2Rec")
 recommendation_engine = None
 
+
 @app.on_event("startup")
 async def startup_event():
     global recommendation_engine
     recommendation_engine = RecommendationEngine()
+
 
 @app.get("/default")
 async def get_default_config() -> DefaultConfig:
@@ -34,9 +41,12 @@ async def chat_stream(query: str):
 
 @app.get("/chat")
 async def chat(query: str):
+    start = perf_counter()
     # TODO: Add guard rails
     # TODO: Get evaluation
-    output = recommendation_engine.run_recommendation_system(query=query)
+    output = await recommendation_engine.run_recommendation_system(query=query)
+    elapsed = perf_counter() - start
+    logger.info(f"Time elapsed: {elapsed:.2f}s")
     return output
 
 
@@ -88,8 +98,7 @@ async def init(request: Request, background_task: BackgroundTasks):
     logger.info(f"Category: {recommendation_engine.category}")
     logger.info(f"Embedding Model: {recommendation_engine.embeddings}")
     logger.info(f"Large Language Model: {recommendation_engine.llm}")
-    # logger.info(f"Collection name: {recommendation_engine.collection_name}")
-    # logger.info(f"Collection name: {recommendation_engine.collection_name}")
+
     if recommendation_engine._embeddings_available:
         logger.info("Embeddings already available")
     else:
