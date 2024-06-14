@@ -9,8 +9,12 @@ from .engine import RecommendationEngine
 from .schemas import DefaultConfig
 
 app = FastAPI(title="Gen2Rec")
-recommendation_engine = RecommendationEngine()
+recommendation_engine = None
 
+@app.on_event("startup")
+async def startup_event():
+    global recommendation_engine
+    recommendation_engine = RecommendationEngine()
 
 @app.get("/default")
 async def get_default_config() -> DefaultConfig:
@@ -39,7 +43,7 @@ async def chat(query: str):
 @app.post("/config")
 async def config(request: Request):
     data = await request.form()
-
+    logger.info(data)
     recommendation_engine.llm = data["large_language_model"]
 
     # TODO: Process user details
@@ -83,6 +87,7 @@ async def init(request: Request, background_task: BackgroundTasks):
     logger.info(f"Collection name: {recommendation_engine.collection_name}")
     logger.info(f"Category: {recommendation_engine.category}")
     logger.info(f"Embedding Model: {recommendation_engine.embeddings}")
+    logger.info(f"Large Language Model: {recommendation_engine.llm}")
     # logger.info(f"Collection name: {recommendation_engine.collection_name}")
     # logger.info(f"Collection name: {recommendation_engine.collection_name}")
     if recommendation_engine._embeddings_available:

@@ -33,9 +33,14 @@ class RecommendationEngine:
         self._available_embedding_models = list(EmbeddingModels())
         self._available_llms = list(LargeLanguageModels())
         self._embeddings = None
-        self._llm = ChatOpenAI(
-            model=LargeLanguageModels.OpenAI.GPT_4O, verbose=False, temperature=0
-        )
+        if os.environ.get("OSS") == "1":
+            logger.info("Setting default language model: llama3:70b")
+            self._llm = ChatOllama(model=LargeLanguageModels.MetaAI.LLAMA_3_70B)
+            logger.info(self._llm)
+        else:
+            self._llm = ChatOpenAI(
+                model=LargeLanguageModels.OpenAI.GPT_4O, verbose=False, temperature=0
+            )
         self._document_content_description = None
         self._vectorstore = None
         self._embeddings_available = os.environ.get("EMBEDDINGS_GENERATED") == "1"

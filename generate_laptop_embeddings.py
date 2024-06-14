@@ -27,8 +27,8 @@ def load_dataset(
     with open(dataset_file_path, "r", encoding=encodings[0].encoding) as csv_file:
         reader = csv.DictReader(csv_file)
         for index, row in enumerate(reader):
-            output = chain.invoke({"specifications": str(row)}).content
             logger.info(f"Improving dataset for row: {index+1} | laptop: {row["name"]}")
+            output = chain.invoke({"specifications": str(row)}).content
             content = (
                 f"{output}\n\n Some of the other specifications are provided below:\n\n"
             )
@@ -46,7 +46,7 @@ def load_dataset(
                     metadata[attribute["name"]] = float(row[attribute["name"]])
             metadata["source"] = index
             docs.append(Document(page_content=content, metadata=metadata))
-            if index == 5:
+            if index == 10:
                 break
 
     return docs
@@ -82,7 +82,7 @@ def main():
             model=EmbeddingModels.VoyageAI.VOYAGE_LARGE_2_INSTRUCT,
             voyage_api_key=os.environ.get("VOYAGE_AI_API_KEY"),
         ),
-        collection_name="laptops5",
+        collection_name="laptops",
         path=os.environ.get("PERSISTENT_EMBEDDINGS_PATH"),
     )
 

@@ -3,6 +3,7 @@ You're a knowledgeable AI specialized in technology, particularly laptops. Your 
 1. Highlight key specifications and features of the laptop, emphasizing its unique selling points.
 2. Suggest the types of tasks this laptop excels at, showcasing its capabilities and potential applications.
 3. Identify the target users who would benefit most from utilizing this laptop, considering their needs and preferences.
+4. Any links for thumbnails if exist.
 
 ONLY provide the description.
 
