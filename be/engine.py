@@ -19,6 +19,8 @@ from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.runnables import RunnablePassthrough
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_voyageai import VoyageAIEmbeddings
+from langchain_community.chat_models import ChatOllama
+from loguru import logger
 
 from .common import EmbeddingModels, LargeLanguageModels
 from .utility import process_template
@@ -74,7 +76,9 @@ class RecommendationEngine:
         if model in EmbeddingModels.OpenAI():
             self._embeddings = OpenAIEmbeddings(model=model)
         elif model in EmbeddingModels.VoyageAI():
-            self._embeddings = VoyageAIEmbeddings(model=model)
+            self._embeddings = VoyageAIEmbeddings(
+                model=model, voyage_api_key=os.environ.get("VOYAGE_AI_API_KEY")
+            )
         else:
             raise RuntimeError(
                 f"Invalid embedding model. Supported embedding models are: {self.available_embedding_models}"
@@ -92,7 +96,7 @@ class RecommendationEngine:
             self._llm = ChatOpenAI(model=model, verbose=False, temperature=0)
 
         elif model in LargeLanguageModels.MetaAI():
-            raise NotImplementedError
+            self._llm = ChatOllama(model=model)
         else:
             raise RuntimeError(
                 f"Invalid large language model. Supported embedding models are: {self.available_llms}"
@@ -130,7 +134,7 @@ class RecommendationEngine:
                 )
 
             self._vectorstore = Qdrant.from_existing_collection(
-                embeddings=self.embeddings,
+                embedding=self.embeddings,
                 path=self._persistent_embeddings_path,
                 collection_name=self.collection_name,
             )
@@ -247,6 +251,7 @@ class RecommendationEngine:
 
     def initialize_recommendation_pipeline(self):
         self.initialize_vectorstore()
+        self.create_retriever_prompt()
         self.initialize_retriever()
 
         def format_docs(docs):
@@ -269,16 +274,25 @@ class RecommendationEngine:
     def chat_history(self):
         return self._chat_history
 
-    def run_recommendation_system(self, query: str, recommendation_only: bool = False):
+    def run_recommendation_system(
+        self, query: str, recommendation_only: bool = False, stream: bool = False
+    ):
+        logger.info(f"Running recommendation system for query: {query}")
         output = self.recommendation_pipeline.invoke(
             {"input": query, "chat_history": self.chat_history}
         )
-        self.recommendation_pipeline.stream()
-        if not recommendation_only:
-            self.chat_history.extend([HumanMessage(content=query), output["answer"]])
-            return output
-        else:
-            return output["context"]
+        # self.recommendation_pipeline.stream()
+        self.chat_history.extend([HumanMessage(content=query), output["answer"]])
+        return output
+
+    def run_recommendation_system_stream(self, query: str):
+        logger.info(f"Running (stream) recommendation system for query: {query}")
+        for chunk in self.recommendation_pipeline.stream(
+            {"input": query, "chat_history": []}
+        ):
+            logger.info(f"Chunk: {chunk}")
+            if "answer" in chunk:
+                yield chunk["answer"]
 
     @property
     def embedding_columns(self):
@@ -321,7 +335,6 @@ class RecommendationEngine:
         ) as csv_file:
             reader = csv.DictReader(csv_file)
             for index, row in enumerate(reader):
-                # TODO: Add improving dataset
                 content = ""
                 for column in self.embedding_columns:
                     content += f"{column}: {row[column]}\n"

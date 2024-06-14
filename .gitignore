@@ -15,3 +15,4 @@ redis-local-data
 *.rdb
 demo-*.yaml
 persistent-embeddings
+temp*

@@ -7,3 +7,4 @@ fastapi
 lark
 loguru
 jinja2
+chardet

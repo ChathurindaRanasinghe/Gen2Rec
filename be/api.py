@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 
 from fastapi import BackgroundTasks, FastAPI, Request, Response, status
+from fastapi.responses import StreamingResponse
 from loguru import logger
 
 from .engine import RecommendationEngine
@@ -11,7 +12,7 @@ app = FastAPI(title="Gen2Rec")
 recommendation_engine = RecommendationEngine()
 
 
-@app.get("/default-config")
+@app.get("/default")
 async def get_default_config() -> DefaultConfig:
     return DefaultConfig(
         llms=recommendation_engine.available_llms,
@@ -21,7 +22,10 @@ async def get_default_config() -> DefaultConfig:
 
 @app.get("/chat-stream")
 async def chat_stream(query: str):
-    raise NotImplementedError("Streaming not supported")
+    return StreamingResponse(
+        recommendation_engine.run_recommendation_system_stream(query=query),
+        media_type="text/event-stream",
+    )
 
 
 @app.get("/chat")
@@ -46,10 +50,10 @@ async def config(request: Request):
 @app.get("/recommendations")
 async def recommendations(number: int):
     # TODO: Process user details
-    return recommendation_engine.run_recommendation_system(
-        query=f"Give me {number} {recommendation_engine.category} recommendations",
-        recommendation_only=True,
+    output = recommendation_engine.run_recommendation_system(
+        query=f"Give me {number} {recommendation_engine.category} recommendations"
     )
+    return output["context"]
 
 
 @app.get("/init-status")
@@ -72,20 +76,25 @@ async def init(request: Request, background_task: BackgroundTasks):
         "document_content_description"
     ]
     recommendation_engine.system_prompt = data["system_prompt"]
-    recommendation_engine.metadata_field_info = json.loads(data["metadata_field_info"])
+    recommendation_engine.metadata_field_info = json.loads(data["metadata_fields"])
     recommendation_engine.embeddings = data["embedding_model"]
     recommendation_engine.category = data["category"]
 
-    dataset = data["dataset_file"]
-    logger.debug(dataset)
+    logger.info(f"Collection name: {recommendation_engine.collection_name}")
+    logger.info(f"Category: {recommendation_engine.category}")
+    logger.info(f"Embedding Model: {recommendation_engine.embeddings}")
+    # logger.info(f"Collection name: {recommendation_engine.collection_name}")
+    # logger.info(f"Collection name: {recommendation_engine.collection_name}")
+    if recommendation_engine._embeddings_available:
+        logger.info("Embeddings already available")
+    else:
+        recommendation_engine.embedding_columns = data["embedding_fields"]
+        dataset = data["dataset_file"]
+        logger.debug(dataset)
+        recommendation_engine.dataset_file_path = Path(f"datasets/{dataset.filename}")
+        with open(recommendation_engine.dataset_file_path, "w") as dataset_file:
+            dataset_file.write(dataset.content)
 
-    recommendation_engine.dataset_file_path = Path(f"datasets/{dataset.filename}")
-
-    with open(recommendation_engine.dataset_file_path, "w") as dataset_file:
-        dataset_file.write(dataset.content)
-
-    recommendation_engine.add_task(
-        recommendation_engine.initialize_recommendation_pipeline()
-    )
+    background_task.add_task(recommendation_engine.initialize_recommendation_pipeline())
 
     return "Initialization successful"
