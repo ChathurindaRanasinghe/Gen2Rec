@@ -20,7 +20,7 @@ METADATA: dict = {
 }
 EMBEDDING_MODELS: list[str] = []
 LARGE_LANGUAGE_MODELS: list[str] = []
-BACKEND_URL: str = "https://b8tbzq9k-8008.asse.devtunnels.ms"
+BACKEND_URL: str = "http://192.168.1.13:8000"
 
 
 def update_fields(dataset_file) -> dict:
@@ -80,7 +80,7 @@ def initialize(
     else:
         try:
             body = {
-                "recommendation_category": recommendation_category.lower(),
+                "category": recommendation_category.lower(),
                 "dataset_file": dataset_file,
                 "embedding_fields": embedding_fields,
                 "improve_dataset": improve_dataset,
@@ -100,7 +100,6 @@ def initialize(
                     if init_status.status_code == 200:
                         INITIALIZED = True
                         CATEGORY = recommendation_category
-                        FIELDS = embedding_fields
                         status = "Successfully initialized"
                     elif init_status.status_code == 201:
                         status = "Initialization in progress"
