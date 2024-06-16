@@ -3,8 +3,8 @@ import json
 from time import sleep
 
 import gradio as gr
+import httpx
 import pandas
-import requests
 
 TITLE: str = "Gen2Rec"
 INITIALIZED: bool = False
@@ -21,6 +21,8 @@ METADATA: dict = {
 EMBEDDING_MODELS: list[str] = []
 LARGE_LANGUAGE_MODELS: list[str] = []
 BACKEND_URL: str = "http://192.168.1.13:8000"
+
+client = httpx.Client(timeout=60)
 
 
 def update_fields(dataset_file) -> dict:
@@ -89,14 +91,14 @@ def initialize(
                 "embedding_model": embedding_model,
                 "system_prompt": system_prompt,
             }
-            response = requests.post(
+            response = client.post(
                 BACKEND_URL + "/init",
                 data=body,
             )
             if response.status_code == 200:
                 while True:
                     sleep(5)
-                    init_status = requests.get(BACKEND_URL + "/init-status")
+                    init_status = client.get(BACKEND_URL + "/init-status")
                     if init_status.status_code == 200:
                         INITIALIZED = True
                         CATEGORY = recommendation_category
@@ -132,7 +134,7 @@ def submit_configurations(large_language_model: str, user_details: str, enable_e
             "user_details": user_details,
             "enable_evaluation": enable_evaluation
         }
-        response = requests.post(
+        response = client.post(
             BACKEND_URL + "/config",
             data=json.dumps(body),
         )
@@ -150,7 +152,7 @@ def submit_configurations(large_language_model: str, user_details: str, enable_e
 def get_recommendations(number: int) -> dict:
     try:
         body = {"number": number}
-        response = requests.get(
+        response = client.get(
             BACKEND_URL + "/recommendations",
             params=body,
         )
@@ -170,7 +172,7 @@ def chat_response(message: str, history: list[str]) -> tuple[str, list]:
     if message:
         try:
             body = {"query": message}
-            response = requests.get(BACKEND_URL + "/chat", params=body)
+            response = client.get(BACKEND_URL + "/chat", params=body)
             if response.status_code == 200:
                 history.append([message, response.json()["answer"]])
             else:
@@ -309,7 +311,7 @@ def get_default_values():
     global EMBEDDING_MODELS
     global LARGE_LANGUAGE_MODELS
     try:
-        response = requests.get(BACKEND_URL + "/default")
+        response = client.get(BACKEND_URL + "/default")
         if response.status_code == 200:
             EMBEDDING_MODELS = response.json()["embedding_models"]
             LARGE_LANGUAGE_MODELS = response.json()["llms"]
