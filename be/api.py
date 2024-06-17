@@ -14,7 +14,7 @@ from .log import logger
 from .schemas import DefaultConfig
 
 app = FastAPI(title="Gen2Rec")
-recommendation_engine = None
+recommendation_engine: RecommendationEngine | None = None
 
 
 @app.on_event("startup")
@@ -64,7 +64,7 @@ async def config(request: Request):
 @app.get("/recommendations")
 async def recommendations(number: int):
     # TODO: Process user details
-    output = recommendation_engine.run_recommendation_system(
+    output = await recommendation_engine.run_recommendation_system(
         query=f"Give me {number} {recommendation_engine.category} recommendations"
     )
     return output["context"]
@@ -99,15 +99,15 @@ async def init(request: Request, background_task: BackgroundTasks):
     logger.info(f"Embedding Model: {recommendation_engine.embeddings}")
     logger.info(f"Large Language Model: {recommendation_engine.llm}")
 
-    if recommendation_engine._embeddings_available:
+    if recommendation_engine.embeddings_available:
         logger.info("Embeddings already available")
     else:
         recommendation_engine.embedding_columns = data["embedding_fields"]
         dataset = data["dataset_file"]
         logger.debug(dataset)
         recommendation_engine.dataset_file_path = Path(f"datasets/{dataset.filename}")
-        with open(recommendation_engine.dataset_file_path, "w") as dataset_file:
-            dataset_file.write(dataset.content)
+        # with open(recommendation_engine.dataset_file_path, "w") as dataset_file:
+        #     # dataset_file.write(dataset.file.)
 
     background_task.add_task(recommendation_engine.initialize_recommendation_pipeline())
 

@@ -19,7 +19,7 @@ setup-test-env: venv
 delete-venv:
 	rm -rf ./venv
 
-.PHONY: run
+
 
 .PHONY: run-ui
 run-ui:
@@ -33,5 +33,8 @@ run-ui:
 start-redis:
 	docker run -d -p 6379:6379 -p 8001:8001 -v $(shell pwd)/redis-local-data/:/data redis/redis-stack:latest
 
+.PHONY: run
+run:
+	fastapi run be/api.py
 
 # export PYTHONPATH="${PYTHONPATH}:$(pwd)"

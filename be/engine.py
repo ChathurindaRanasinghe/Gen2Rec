@@ -5,7 +5,7 @@ from typing import List
 
 from dotenv import load_dotenv
 from langchain.chains.history_aware_retriever import create_history_aware_retriever
-from langchain.chains.query_constructor.base import AttributeInfo
+from langchain.chains.query_constructor.schema import AttributeInfo
 from langchain.chains.retrieval import create_retrieval_chain
 from langchain.retrievers.self_query.base import SelfQueryRetriever
 from langchain_community.chat_models import ChatOllama
@@ -16,15 +16,12 @@ from langchain_core.embeddings import Embeddings
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.messages import HumanMessage
 from langchain_core.output_parsers import StrOutputParser
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.prompts import MessagesPlaceholder
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.runnables import RunnablePassthrough
-from langchain_openai import ChatOpenAI
-from langchain_openai import OpenAIEmbeddings
+from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_voyageai import VoyageAIEmbeddings
 
-from .common import EmbeddingModels
-from .common import LargeLanguageModels
+from .common import EmbeddingModels, LargeLanguageModels
 from .log import logger
 from .utility import process_template
 
@@ -54,6 +51,7 @@ class RecommendationEngine:
         self._metadata_field_info = None
         self._category = None
         self._retriever_prompt_path = os.environ.get("RETRIEVER_PROMPT_PATH")
+        self._guard_rails_prompt_path = os.environ.get("GUARDRAILS_PROMPT_PATH")
         self._retriever_prompt = None
         self._retriever = None
         self._system_prompt = None
@@ -270,10 +268,10 @@ class RecommendationEngine:
             )
 
         rag_chain_from_docs = (
-            RunnablePassthrough.assign(context=(lambda x: format_docs(x["context"])))
-            | self.system_prompt
-            | self.llm
-            | StrOutputParser()
+                RunnablePassthrough.assign(context=(lambda x: format_docs(x["context"])))
+                | self.system_prompt
+                | self.llm
+                | StrOutputParser()
         )
 
         self._recommendation_pipeline = create_retrieval_chain(
@@ -285,7 +283,7 @@ class RecommendationEngine:
         return self._chat_history
 
     async def run_recommendation_system(
-        self, query: str, recommendation_only: bool = False, stream: bool = False
+            self, query: str, recommendation_only: bool = False, stream: bool = False
     ):
         logger.info(f"Running recommendation system for query: {query}")
         output = await self.recommendation_pipeline.ainvoke(
@@ -298,7 +296,7 @@ class RecommendationEngine:
     async def run_recommendation_system_stream(self, query: str):
         logger.info(f"Running (stream) recommendation system for query: {query}")
         async for chunk in self.recommendation_pipeline.astream(
-            {"input": query, "chat_history": []}
+                {"input": query, "chat_history": []}
         ):
             logger.info(f"Chunk: {chunk}")
             if "answer" in chunk:
@@ -336,12 +334,12 @@ class RecommendationEngine:
         self._collection_name = name
 
     def load_dataset(
-        self,
+            self,
     ) -> List[Document]:
         docs = []
         encodings = detect_file_encodings(self.dataset_file_path)
         with open(
-            self.dataset_file_path, "r", encoding=encodings[0].encoding
+                self.dataset_file_path, "r", encoding=encodings[0].encoding
         ) as csv_file:
             reader = csv.DictReader(csv_file)
             for index, row in enumerate(reader):
@@ -361,3 +359,25 @@ class RecommendationEngine:
                 docs.append(Document(page_content=content, metadata=metadata))
 
         return docs
+
+    def check_query(self) -> bool:
+        def parser(ai_message) -> bool:
+            print(ai_message)
+
+        prompt = ChatPromptTemplate.from_messages(
+            [
+                (
+                    "system",
+                    process_template(
+                        self._guard_rails_prompt_path, {"category": self.category}
+                    ),
+                ),
+                ("human", MessagesPlaceholder("query")),
+            ]
+        )
+
+        # guard_chain =
+
+    @property
+    def embeddings_available(self):
+        return self._embeddings_available
