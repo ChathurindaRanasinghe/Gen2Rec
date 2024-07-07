@@ -5,7 +5,7 @@ import panel as pn
 
 pn.extension("perspective")
 
-BACKEND_URL: str = "http://192.168.164.171:8000"
+BACKEND_URL: str = "http://192.168.194.170:8000"
 client = httpx.Client(timeout=60)
 
 
@@ -61,7 +61,7 @@ async def gen2rec_callback(contents, user, instance):
             yield message
 
 
-cards = get_recs(2)
+cards = get_recs(10)
 odd_cards = [card for idx, card in enumerate(cards) if idx % 2 != 0]
 even_cards = [card for idx, card in enumerate(cards) if idx % 2 == 0]
 
@@ -96,4 +96,4 @@ layout = pn.Column(
     margin=(10, 50),
 )
 
-layout.servable()
+layout.servable(title="Laptop Arcade")
