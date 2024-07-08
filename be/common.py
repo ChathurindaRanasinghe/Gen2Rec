@@ -24,6 +24,7 @@ class EmbeddingModels(ConstantGroup):
 class LargeLanguageModels(ConstantGroup):
     class OpenAI(ConstantGroup):
         GPT_4O = "gpt-4o"
+        GPT_35_TURBO = "gpt-3.5-turbo-0125"
 
     class MetaAI(ConstantGroup):
         LLAMA_3_70B = "llama3:70b"

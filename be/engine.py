@@ -39,8 +39,13 @@ class RecommendationEngine:
             logger.info(self._llm)
         else:
             logger.info("Setting default language model: gpt-4o")
+            # self._llm = ChatOpenAI(
+            #     model=LargeLanguageModels.OpenAI.GPT_4O, verbose=False, temperature=0
+            # )
             self._llm = ChatOpenAI(
-                model=LargeLanguageModels.OpenAI.GPT_4O, verbose=False, temperature=0
+                model=LargeLanguageModels.OpenAI.GPT_35_TURBO,
+                verbose=False,
+                temperature=0,
             )
             logger.info(self._llm)
         self._document_content_description = None
@@ -268,10 +273,10 @@ class RecommendationEngine:
             )
 
         rag_chain_from_docs = (
-                RunnablePassthrough.assign(context=(lambda x: format_docs(x["context"])))
-                | self.system_prompt
-                | self.llm
-                | StrOutputParser()
+            RunnablePassthrough.assign(context=(lambda x: format_docs(x["context"])))
+            | self.system_prompt
+            | self.llm
+            | StrOutputParser()
         )
 
         self._recommendation_pipeline = create_retrieval_chain(
@@ -283,7 +288,7 @@ class RecommendationEngine:
         return self._chat_history
 
     async def run_recommendation_system(
-            self, query: str, recommendation_only: bool = False, stream: bool = False
+        self, query: str, recommendation_only: bool = False, stream: bool = False
     ):
         logger.info(f"Running recommendation system for query: {query}")
         output = await self.recommendation_pipeline.ainvoke(
@@ -296,7 +301,7 @@ class RecommendationEngine:
     async def run_recommendation_system_stream(self, query: str):
         logger.info(f"Running (stream) recommendation system for query: {query}")
         async for chunk in self.recommendation_pipeline.astream(
-                {"input": query, "chat_history": []}
+            {"input": query, "chat_history": []}
         ):
             logger.info(f"Chunk: {chunk}")
             if "answer" in chunk:
@@ -334,12 +339,12 @@ class RecommendationEngine:
         self._collection_name = name
 
     def load_dataset(
-            self,
+        self,
     ) -> List[Document]:
         docs = []
         encodings = detect_file_encodings(self.dataset_file_path)
         with open(
-                self.dataset_file_path, "r", encoding=encodings[0].encoding
+            self.dataset_file_path, "r", encoding=encodings[0].encoding
         ) as csv_file:
             reader = csv.DictReader(csv_file)
             for index, row in enumerate(reader):
