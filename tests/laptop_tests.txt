@@ -1,0 +1,57 @@
+
+description: 'Gen2Rec eval'
+
+providers:
+  - id: 'python:gen2rec_provider.py'
+    config:
+      pythonExecutable: /home/ubuntu/gen2rec.dev/Gen2Rec/venv/bin/python
+
+prompts:
+  - "{{context}}"
+
+tests:
+  - vars:
+      context: Can you recommend me a laptop for gaming and graphic design?
+    assert:
+      - type: llm-rubric
+        value: Should suggest a laptop with a powerful graphics card, high RAM, and a fast processor to handle gaming and graphic design tasks effectively.
+
+  - vars:
+      context: I need a laptop for programming and software development.
+    assert:
+      - type: llm-rubric
+        value: Should recommend a laptop with a fast processor, ample RAM, and sufficient storage capacity, along with compatibility with programming tools and IDEs commonly used in software development.
+
+  - vars:
+      context: I want a laptop for multimedia editing (video/audio/photo).
+    assert:
+      - type: llm-rubric
+        value: Should suggest a laptop with a high-resolution display, powerful processor, dedicated graphics card, and ample RAM for smooth multimedia editing experience, along with compatibility with popular editing software like Adobe Creative Suite or DaVinci Resolve.
+
+  - vars:
+      context: I'm looking for a laptop for casual use and entertainment purposes.
+    assert:
+      - type: llm-rubric
+        value: Should provide a laptop with a decent processor, sufficient RAM, and a good display for watching movies, browsing the internet, and casual gaming, prioritizing affordability and battery life.
+
+  - vars:
+      context: I need a laptop for business and productivity tasks.
+    assert:
+      - type: llm-rubric
+        value: Should recommend a laptop with a reliable processor, ample RAM, and a comfortable keyboard for extended typing sessions, along with security features and compatibility with productivity software like Microsoft Office or G Suite.
+
+  - vars:
+      context: I'm a student and I want a laptop for both studying and entertainment.
+    assert:
+      - type: llm-rubric
+        value: Should suggest a versatile laptop with a balance of performance, portability, and battery life, suitable for studying, note-taking, and entertainment activities like streaming videos or light gaming.
+  - vars:
+      context: recommend me a laptop
+    assert:
+      - type: llm-rubric
+        value: The response should not recommend any laptops to the user and should encourage the user to give more details about the user's requirement, budget, some background details about the users etc.
+  - vars:
+      context: Can u tell me about the newest updates about quantum computing?
+    assert:
+      - type: llm-rubric
+        value: The response should not include answers for the users question. It should only contain the idea that the query is invalid.
