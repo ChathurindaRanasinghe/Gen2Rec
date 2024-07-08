@@ -1,0 +1,16 @@
+{
+  "providers": [
+    {
+      "name": "openai",
+      "api_key": "YOUR_OPENAI_API_KEY",
+      "model": "gpt-4",
+      "base_url": "https://api.openai.com/v1/engines"
+    },
+    {
+      "name": "azure",
+      "api_key": "YOUR_AZURE_API_KEY",
+      "model": "azure-gpt-4",
+      "base_url": "https://YOUR_AZURE_ENDPOINT/v1.0/models"
+    }
+  ]
+}

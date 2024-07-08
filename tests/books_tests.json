@@ -1,0 +1,161 @@
+{
+  "tests": [
+    {
+      "name": "Books Test 1",
+      "prompt": "My son is a primary school student. suggest me a good comic book to buy for him.",
+      "rubric": {
+        "criteria": [
+          {
+            "name": "Relevance",
+            "description": "The response should suggest books that belongs to the comic category and is also suitable for a primary child without any unsuitable content such as extream hatespeech and sexually explicit content.",
+            "score": 5
+          }
+        ]
+      }
+    },
+    {
+      "name": "Books Test 2",
+      "prompt": "I am a sri lankan middle school student. We had a lesson on our history book about Vasco Da Gama. I want to know more about that character. can u suggest me somebooks to read about it.",
+      "rubric": {
+        "criteria": [
+          {
+            "name": "Relevance",
+            "description": "The response should suggest books about the life of Vasco Da Gama and his exploratory work.",
+            "score": 5
+          }
+        ]
+      }
+    },
+    {
+      "name": "Books Test 3",
+      "prompt": "I am a huge fan of the Harry potter book series by J.K.Rowling. I wanna read another book series like that. Can u suggest me a good series?.",
+
+      "rubric": {
+        "criteria": [
+          {
+            "name": "Relevance",
+            "description": "The response should suggest book series that are similar in category and content to the Harry Potter book series by J.K.Rowling",
+            "score": 5
+          }
+        ]
+      }
+    },
+    {
+      "name": "Books Test 4",
+      "prompt": "I am a retired senior citizen. I am interested in photography. But i am still a beginner. Suggest me some books to improve my skills in photography.",
+      "rubric": {
+        "criteria": [
+          {
+            "name": "Relevance",
+            "description": "The response should suggest books about photography and should be beginner friendly.But the suggested books should also be for adults and should not belong to the children's books category.",
+            "score": 5
+          }
+        ]
+      }
+    },
+    {
+      "name": "Books Test 5",
+      "prompt": "Suggest me a book.",
+      "rubric": {
+        "criteria": [
+          {
+            "name": "Accuracy",
+            "description": "The response should not suggest any books. It should ask the user to enter more details about user's likes and preferences,hobbies, previous books the user has liked,user's age and etc.",
+            "score": 5
+          }
+        ]
+      }
+    },
+    {
+      "name": "Books Test 6",
+      "prompt": "I am a huge fan of the Game of Thrones movie series. I want to read the book series related to movies. Suggest me the books related to the series.",
+      "rubric": {
+        "criteria": [
+          {
+            "name": "Relevance",
+            "description": "The response should suggest books belonging to the Game of Thromes series by George R. Matrin. Its also okay to include books belonging to the 'House of the Dragon' series, which is a pre-sequel to the Game of Thrones series.",
+            "score": 5
+          }
+        ]
+      }
+    },
+    {
+      "name": "Books Test 7",
+      "prompt": "I am a fan of the book Pride and Prejudice by Jane Austin, but I don't like the book 'Wuthering Heights' by the same author. Can u recommend me a good book that would suit my taste? ",
+      "rubric": {
+        "criteria": [
+          {
+            "name": "Relevance",
+            "description": "The response should suggest books that are similar to the book the 'Pride and Prejudice', and should not recommend the books similar to the book 'Wuthering Heights' even though its from the same author. First differenciate between the 2 books and then identify the category and nature of the content of the book the user likes before the recommendation and then recommend the books.",
+            "score": 5
+          }
+        ]
+      }
+    },
+    {
+      "name": "Books Test 8",
+      "prompt": "I don't like the book 'Princess Diaries'. Can you suggest me a good book.",
+      "rubric": {
+        "criteria": [
+          {
+            "name": "Accuracy",
+            "description": "The user data contain only about what is disliked. But it is needed to get data about what is actually like by the user.It should ask the user to enter more details about user's likes and preferences,hobbies, previous books the user has liked,user's age and etc.",
+            "score": 5
+          }
+        ]
+      }
+    },
+    {
+      "name": "Books Test 9",
+      "prompt": "Can u suggests me some books that have won awards?",
+      "rubric": {
+        "criteria": [
+          {
+            "name": "Relevance",
+            "description": "The response should suggest books that have won one or more awards related to literature",
+            "score": 5
+          }
+        ]
+      }
+    },
+    {
+      "name": "Books Test 10",
+      "prompt": " I want to buy the book 'The Silmarilion'. Is it available with you? If not can u suggest me a similar book",
+      "rubric": {
+        "criteria": [
+          {
+            "name": "Relevance",
+            "description": "The response should suggest the book  'The Silmarilion' if its available. If not, suggests some other books similar to that. The similar books can be from the same or different others that contain similar content",
+            "score": 5
+          }
+        ]
+      }
+    },
+    {
+      "name": "Books Test 11",
+      "prompt": " Can u tell me what are the awards and their categories available for authors around the world?",
+      "rubric": {
+        "criteria": [
+          {
+            "name": "Accuracy",
+            "description": "The response should not suggest any books or answer the question asked since the user is not asking for a book recommendation",
+            "score": 5
+          }
+        ]
+      }
+    },
+    {
+      "name": "Books Test 12",
+      "prompt": " can u suggest me some best selling self help and financial advice books?",
+      "rubric": {
+        "criteria": [
+          {
+            "name": "Relevance",
+            "description": "The response should suggest the most popular and best selling books belonging to the category 'self help', 'financial advices' or both.",
+            "score": 5
+          }
+        ]
+      }
+    }
+  ]
+}

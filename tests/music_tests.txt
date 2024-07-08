@@ -1,0 +1,68 @@
+
+description: 'Gen2Rec eval'
+
+providers:
+  - id: 'python:gen2rec_provider.py'
+    config:
+      pythonExecutable: /home/ubuntu/gen2rec.dev/Gen2Rec/venv/bin/python
+
+prompts:
+  - "{{context}}"
+
+tests:
+  - vars:
+      context: Suggest me a song
+    assert:
+      - type: llm-rubric
+        value: The response should not recommend any songs or music to the user and should encourage the user to give more details about the user's liked generes, liked artists, some faviourite tracks etc.
+
+  - vars:
+      context:I'm a huge fan of acoustic music. Can u suggest me a song?
+    assert:
+      - type: llm-rubric
+        value: Response should be high in acoustic nature.
+
+  - vars:
+      context:I need some songs for our dance party. The duration of each song has to be more than 3 minutes. Can u suggest me some songs?
+    assert:
+      - type: llm-rubric
+        value: The suggested songs or music should be high in dancability and tempo and can be high-medium in energy.
+  - vars:
+      context: Give me  some recent top hits
+    assert:
+      - type: llm-rubric
+        value: The response should not include some of the recent, highest popular songs.
+
+  - vars:
+      context:  I'm a huge fan of Beethovan. Can u suggest me some music to listen to?
+
+    assert:
+      - type: llm-rubric
+        value: The response should contain either music composed by Beethovan or other composers that is much similar to the style of Beethovan's music.
+  - vars:
+      context: I'm a huge fan of Ed Sheeran. Can u suggest me some music?
+    assert:
+      - type: llm-rubric
+        value: The response should contain songs by Ed Sheeran or other musicians, which is very similar to the style followed by Ed Sheeran.
+  - vars:
+      context:I need some music to listen to while im studying.
+    assert:
+      - type: llm-rubric
+        value: The suggested music should be subtle and not too distracting. It has to be low energy, low -medium tempo and about medium in acoustics.
+  - vars:
+      context: Who are the most listened artists on Spotify so far?.
+    assert:
+      - type: llm-rubric
+        value: The response should not include answers for the users question. It should only contain the idea that the query is invalid.
+  - vars:
+      context: Can you suggest me some songs similar to "baby" by Justin Bieber
+    assert:
+      - type: llm-rubric
+        value: The response should include songs similar to the style of the song "Baby" by Justin Beiber.
+
+  - vars:
+      context:Suggest me some songs or instrumentals to play as bedtime music for my 5 yr old son.
+    assert:
+      - type: llm-rubric
+        value: The response should should include slow music suitable for lullabuys or bed time music.It can be either songs or instrumental music. If songs are recommended, the lyrics should be suitable for children.
+ 
