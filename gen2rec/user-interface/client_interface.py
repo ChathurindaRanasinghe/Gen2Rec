@@ -20,7 +20,7 @@ METADATA: dict = {
 }
 EMBEDDING_MODELS: list[str] = []
 LARGE_LANGUAGE_MODELS: list[str] = []
-BACKEND_URL: str = "http://192.168.1.13:8000"
+BACKEND_URL: str = "http://192.168.20.170:8000"
 
 client = httpx.Client(timeout=60)
 
@@ -117,7 +117,8 @@ def initialize(
         gr.update(interactive=INITIALIZED),
         gr.update(interactive=INITIALIZED),
         gr.update(value=status),
-        gr.update(value=f"# {TITLE} - {CATEGORY.capitalize()} Recommendation"),
+        gr.update(value=(f"# {TITLE} - {CATEGORY.capitalize()} Recommendation"
+                         if INITIALIZED else TITLE)),
     )
 
 
@@ -136,7 +137,7 @@ def submit_configurations(large_language_model: str, user_details: str, enable_e
         }
         response = client.post(
             BACKEND_URL + "/config",
-            data=json.dumps(body),
+            data=body,
         )
         if response.status_code == 200:
             status = "Configurations updated successfully"

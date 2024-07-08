@@ -5,13 +5,13 @@ import panel as pn
 
 pn.extension("perspective")
 
-BACKEND_URL: str = "http://192.168.194.170:8000"
+BACKEND_URL: str = "http://192.168.20.170:8000"
 client = httpx.Client(timeout=60)
 
 
 def create_card(data):
     return pn.Row(
-        pn.pane.Image(data["thumbnail"], width=240, height=240),
+        pn.pane.Image(data["thumbnail"], width=240, height=240, margin=20),
         pn.Column(
             pn.pane.Markdown(f"""
                         ### {data["name"]} ({data["launch_year"]})
@@ -25,9 +25,9 @@ def create_card(data):
                         Operating System: {data["operating_system"]}
                         Price: ${data["price"]}
                         """),
-            margin=10
+            margin=20
         ),
-        width=580,
+        width=680,
         margin=10,
         styles=dict(background='WhiteSmoke')
     )
