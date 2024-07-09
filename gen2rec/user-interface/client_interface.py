@@ -20,7 +20,7 @@ METADATA: dict = {
 }
 EMBEDDING_MODELS: list[str] = []
 LARGE_LANGUAGE_MODELS: list[str] = []
-BACKEND_URL: str = "http://192.168.20.170:8000"
+BACKEND_URL: str = "http://192.168.20.170:8001"
 
 client = httpx.Client(timeout=60)
 
@@ -118,7 +118,7 @@ def initialize(
         gr.update(interactive=INITIALIZED),
         gr.update(value=status),
         gr.update(value=(f"# {TITLE} - {CATEGORY.capitalize()} Recommendation"
-                         if INITIALIZED else TITLE)),
+                         if INITIALIZED else f"# {TITLE}")),
     )
 
 
