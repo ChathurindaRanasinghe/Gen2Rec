@@ -15,59 +15,126 @@ tests:
     assert:
       - type: llm-rubric
         value: The response should not recommend any houses to the user and should encourage the user to give more details about the user's requirement, budget, how many people are going to live in the house, preferred environment and any other special concern.
+      -type:answer-relevance
+        threshold:0.9
+      -type:context-relevance
+        threshold:0.9
+      -type:context-faithfulness
+        threshold:0.9
+  
   - vars:
       context:I am looking for a house with 4 bedrooms and 2 bathrooms, large kitchen area and parking space for 2 vehicles. At least one of the 2 bathrooms have to be attached and the neighborhood should be calm and peaceful.
 
     assert:
       - type: llm-rubric
         value: Response should contain a house strickly adhereing to the requirements on the number of bedrooms and bathrooms and parking space. Also the suggested results must be from a calm and peaceful environment.
+      -type:answer-relevance
+        threshold:0.9
+      -type:context-relevance
+        threshold:0.9
+      -type:context-faithfulness
+        threshold:0.9
+  
+  
+  
   - vars:
       context:I have a family of 4 including me, my partner and our 2 children of age 8 and 6. We are looking for a house belonging to the low-medium price range.
 
     assert:
       - type: llm-rubric
         value: Adhere to the users price range, and the number of family members. The recommended results have at least 2 rooms and at most 4 rooms. Since the children are small, having some outdoor space for them to play is a plus point. The safety of children should also be considered by avoiding properties close to water bodies etc.
+      -type:answer-relevance
+        threshold:0.9
+      -type:context-relevance
+        threshold:0.9
+      -type:context-faithfulness
+        threshold:0.9
 
   - vars:
       context: I am looking for a water-front property with a nice view. The number of bedrooms can be 3-5 and there should be a minimum of 2 bathrooms and a maximum of 4 bathrooms.
     assert:
       - type: llm-rubric
         value: The response should strickly adhere to the conditions related to the number of rooms and bathrooms. The property must be a water-front property.
+      -type:answer-relevance
+        threshold:0.9
+      -type:context-relevance
+        threshold:0.9
+      -type:context-faithfulness
+        threshold:0.9
 
   - vars:
       context:  I have a big family of 7 people including me, my partner, my 3 children (14 yrs female,10 yrs male and 5yrs male) and my elderly parents. We are looking for a house from the medium-high price range with ample garden space for my kids to play and also to accommodate our 2 Great Dane dogs.
-
 
     assert:
       - type: llm-rubric
         value: The response should contain a relatively large house/houses. The house could be single-floor or more than 1 floors but with easy access for the elderly people.There should be outdoor space for the children and the 2 large breed dogs. To accommodate all the people there should be minimum of 3 rooms at least and there should be atleast 2 bathrooms.
 The community should be pet friendly.
+      -type:answer-relevance
+        threshold:0.9
+      -type:context-relevance
+        threshold:0.9
+      -type:context-faithfulness
+        threshold:0.9
+
   - vars:
       context: I am an elderly person. I'm looking for a small house for me and my husband. Please recommend me a good house.
     assert:
       - type: llm-rubric
         value: The response should contain small house/houses with easy access and security for elderly people.
+      -type:answer-relevance
+        threshold:0.9
+      -type:context-relevance
+        threshold:0.9
+      -type:context-faithfulness
+        threshold:0.9
+
   - vars:
       context:I am engaged in real estate business. I am looking for properties that are good for re-selling after sometime , with some modifications. Suggest me some good properties. I am interested in both housing properties as well as properties that can be sold for office spaces, holiday resorts etc.
 
     assert:
       - type: llm-rubric
         value: The suggested properties should be of either high economical value or there should be room for further modifications.
+      -type:answer-relevance
+        threshold:0.9
+      -type:context-relevance
+        threshold:0.9
+      -type:context-faithfulness
+        threshold:0.9
+
   - vars:
       context: I am looking for a good house that i can use for a office space. My company has about 25 employees at the moment and we are expecting to expand to around 60 recently. We have 3 sections and roughly about 20 employees will be in each section after expansion. In addition to working space, we need space for a common lobby, meeting room for each section as well as lunch room and a small recreation area as well.
     assert:
       - type: llm-rubric
         value: The recommended property should cater to all the requirements mentioned by the user.
+      -type:answer-relevance
+        threshold:0.9
+      -type:context-relevance
+        threshold:0.9
+      -type:context-faithfulness
+        threshold:0.9
+
   - vars:
       context:I'm looking for a large property that i can use for a small holiday resort. The house size should be more than 4000 square feet and the land size should be more than 50 perches with ample garden space for outdoor activities. Having a swimming pool is also a huge plus point.
 
     assert:
       - type: llm-rubric
         value: The recommended property should cater to all the requirements mentioned by the user.
+      -type:answer-relevance
+        threshold:0.9
+      -type:context-relevance
+        threshold:0.9
+      -type:context-faithfulness
+        threshold:0.9
 
   - vars:
       context: I am looking for a house in the meethotamulla area. Can u please tell me about the meeethotamulla garbage dump disaster and how it affected the neighbours?
     assert:
       - type: llm-rubric
         value: The response should not include answers for the users question. It should only contain the idea that the query is invalid.
+      -type:answer-relevance
+        threshold:0.9
+      -type:context-relevance
+        threshold:0.9
+      -type:context-faithfulness
+        threshold:0.9
  

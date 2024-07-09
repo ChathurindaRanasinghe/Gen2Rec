@@ -15,54 +15,118 @@ tests:
     assert:
       - type: llm-rubric
         value: The response should suggest news about economics, economics related activities, news related to world politics and world leaders, political situations of different scenarios etc.
+      -type:answer-relevance
+        threshold:0.9
+      -type:context-relevance
+        threshold:0.9
+      -type:context-faithfulness
+        threshold:0.9
+
   - vars:
       context:It is the season of wildfires in USA. suggest the user some news.
     assert:
       - type: llm-rubric
         value: Response should contain news about wildfires in USA.
+      -type:answer-relevance
+        threshold:0.9
+      -type:context-relevance
+        threshold:0.9
+      -type:context-faithfulness
+        threshold:0.9
 
   - vars:
       context:The user is a professional soccer player. suggest the user some news.
     assert:
       - type: llm-rubric
         value: The news suggested to the user should contain news about soccer and other sports related events, according to the user's interests.
+      -type:answer-relevance
+        threshold:0.9
+      -type:context-relevance
+        threshold:0.9
+      -type:context-faithfulness
+        threshold:0.9
 
   - vars:
       context: Can u specify what are the security concerns we should follow when we store and use the user details for recommendations specified to the European Union countries?
     assert:
       - type: llm-rubric
         value: The response should not include answers for the users question. It should only contain the idea that the query is invalid.
+      -type:answer-relevance
+        threshold:0.9
+      -type:context-relevance
+        threshold:0.9
+      -type:context-faithfulness
+        threshold:0.9
 
   - vars:
       context:  The user is a teenager interested in Hollywood celebrities and pop-bands. Recommend the user some news.
 
     assert:
       - type: llm-rubric
-        value: The response should contain news about music in general, pop bands around the world, Hollywood celebrities and etc. 
+        value: The response should contain news about music in general, pop bands around the world, Hollywood celebrities and etc.
+      -type:answer-relevance
+        threshold:0.9
+      -type:context-relevance
+        threshold:0.9
+      -type:context-faithfulness
+        threshold:0.9
+
   - vars:
       context: A presidential election is upcoming in the next week. Suggest the user some news.
     assert:
       - type: llm-rubric
         value: The response should contain news related to the upcoming presedential election as it is a significant upcoming event.
+      -type:answer-relevance
+        threshold:0.9
+      -type:context-relevance
+        threshold:0.9
+      -type:context-faithfulness
+        threshold:0.9
+
   - vars:
       context:The user is a Sri Lankan and is interested in world politics and current affairs. He is also a huge fan of sports. Suggest the user some news.
     assert:
       - type: llm-rubric
         value: The suggested news should contain news about world politics, current affairs and any news related to any type of sports.
+      -type:answer-relevance
+        threshold:0.9
+      -type:context-relevance
+        threshold:0.9
+      -type:context-faithfulness
+        threshold:0.9
+
   - vars:
       context: The user is looking for good investment opportunities. Suggest the user some news.
     assert:
       - type: llm-rubric
         value: The recommended news should contain anything related to finance, amendment of fiscal policies, change in interests and other rates, world economics, economic predictions and etc.
+      -type:answer-relevance
+        threshold:0.9
+      -type:context-relevance
+        threshold:0.9
+      -type:context-faithfulness
+        threshold:0.9  
+  
   - vars:
       context:The user is interested in the stock market. Suggest him if its a good idea or not to invest in the stock market according to the recent news and current affairs
     assert:
       - type: llm-rubric
         value: The response should not include answers for the users question. It should only contain the idea that the query is invalid.
+      -type:answer-relevance
+        threshold:0.9
+      -type:context-relevance
+        threshold:0.9
+      -type:context-faithfulness
+        threshold:0.9
 
   - vars:
       context:suggest some news to the user.
     assert:
       - type: llm-rubric
         value: The response should not recommend any news to the user and should encourage the user to give more details about the user's likes and preferences, age, country, profession and etc.
- 
+      -type:answer-relevance
+        threshold:0.9
+      -type:context-relevance
+        threshold:0.9
+      -type:context-faithfulness
+        threshold:0.9

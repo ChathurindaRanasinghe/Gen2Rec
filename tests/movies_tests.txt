@@ -15,23 +15,48 @@ tests:
     assert:
       - type: llm-rubric
         value: The response should suggest movies that are siilar to the Harry Potter series, and should not recommend movies similar to Fantastic Beasts . First differenciate between the 2 movies and then identify the category and nature of the content of the movies the user likes before the recommendation and then recommend the movies.
+      -type:answer-relevance
+        threshold:0.9
+      -type:context-relevance
+        threshold:0.9
+      -type:context-faithfulness
+        threshold:0.9
+  
   - vars:
       context:Suggest me a good movie
     assert:
       - type: llm-rubric
         value: The response should not recommend any movies to the user and should encourage the user to give more details about the user's likes and preferences, age, country, some other liked movies etc.
+      -type:answer-relevance
+        threshold:0.9
+      -type:context-relevance
+        threshold:0.9
+      -type:context-faithfulness
+        threshold:0.9
 
   - vars:
       context:Suggest me a movie similar to the movie "memento" from Christohper Nolan, from the story line from different countries around the world.
     assert:
       - type: llm-rubric
         value: suggest a movie with the story line similar to the movie "memento", but the stories can be from around the world.
+      -type:answer-relevance
+        threshold:0.9
+      -type:context-relevance
+        threshold:0.9
+      -type:context-faithfulness
+        threshold:0.9
 
   - vars:
       context: Can you suggest me some recent movies with the highest rating.
     assert:
       - type: llm-rubric
         value: The response should give movies that have got the highest IMDB ratings within the recent years, and the systems should also give the last date of the most recent data it can use in the recommendation process.
+      -type:answer-relevance
+        threshold:0.9
+      -type:context-relevance
+        threshold:0.9
+      -type:context-faithfulness
+        threshold:0.9
 
   - vars:
       context:  What is the reason for having multiple reboots of the Spider Man movie series? Can you mention the differences between them.
@@ -39,19 +64,46 @@ tests:
     assert:
       - type: llm-rubric
         value: The response should provide answers to the question asked by the user. It should indicate that the query by the user is not valid. The system should only answer questions 
+      -type:answer-relevance
+        threshold:0.9
+      -type:context-relevance
+        threshold:0.9
+      -type:context-faithfulness
+        threshold:0.9
+  
   - vars:
       context: I am a big fan of Tom Cruise. Can you suggest me some good movies of Tom Cruise?
     assert:
       - type: llm-rubric
         value: The response should suggest movies where tom cruise is starring, much better to suggest movies where tom cruise is starring as the lead role.
+      -type:answer-relevance
+        threshold:0.9
+      -type:context-relevance
+        threshold:0.9
+      -type:context-faithfulness
+        threshold:0.9  
+  
   - vars:
       context:I like the actor who plays "Legolas" in the Lord of the Rings movie series. Can you suggests me some other movies of him?
     assert:
       - type: llm-rubric
         value: The response should suggest movies where Orlando Bloom is starring, better to suggest movies where Orlando Bloom is starring as the lead role.
+      -type:answer-relevance
+        threshold:0.9
+      -type:context-relevance
+        threshold:0.9
+      -type:context-faithfulness
+        threshold:0.9
+  
+  
   - vars:
       context: What happened to Jaquen Hagar in the Game of Throne series? Where was he after he met Arya Stark last? what are the possible theories according to the neitizens.
     assert:
       - type: llm-rubric
         value: The system should not recommend anything. The user is not asking for a recommendation for a movie. The response should indicate that it is not a valid response and not recommend anything.
- 
+      -type:answer-relevance
+        threshold:0.9
+      -type:context-relevance
+        threshold:0.9
+      -type:context-faithfulness
+        threshold:0.9

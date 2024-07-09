@@ -15,63 +15,140 @@ tests:
     assert:
       - type: llm-rubric
         value: The response should suggest books that belongs to the comic category and is also suitable for a primary school child without any unsuitable content such as extreme hate speech and sexually explicit content.
-
+      -type:answer-relevance
+        threshold:0.9
+      -type:context-relevance
+        threshold:0.9
+      -type:context-faithfulness
+        threshold:0.9
   - vars:
       context:I am a sri lankan middle school student. We had a lesson on our history book about Vasco Da Gama. I want to know more about that character. Can u suggest me somebooks to read about it.
     assert:
       - type: llm-rubric
         value: The response should suggest books about the life of Vasco Da Gama and his exploratory work.
+      -type:answer-relevance
+        threshold:0.9
+      -type:context-relevance
+        threshold:0.9
+      -type:context-faithfulness
+        threshold:0.9
 
   - vars:
       context:I am a huge fan of the Harry potter book series by J.K.Rowling. I wanna read another book series like that. Can u suggest me a good series?.
     assert:
       - type: llm-rubric
         value: The response should suggest book series that are similar in category and content to the Harry Potter book series by J.K.Rowling
+      -type:answer-relevance
+        threshold:0.9
+      -type:context-relevance
+        threshold:0.9
+      -type:context-faithfulness
+        threshold:0.9
 
   - vars:
       context: I am a retired senior citizen. I am interested in photography. But i am still a beginner. Suggest me some books to improve my skills in photography.
     assert:
       - type: llm-rubric
         value: The response should suggest books about photography and should be beginner friendly.But the suggested books should also be for adults and should not belong to the children's books category.
+      -type:answer-relevance
+        threshold:0.9
+      -type:context-relevance
+        threshold:0.9
+      -type:context-faithfulness
+        threshold:0.9
 
   - vars:
       context: Suggest me a book.
     assert:
       - type: llm-rubric
         value: The response should not suggest any books. It should ask the user to enter more details about user's likes and preferences,hobbies, previous books the user has liked,user's age and etc.
+      -type:answer-relevance
+        threshold:0.9
+      -type:context-relevance
+        threshold:0.9
+      -type:context-faithfulness
+        threshold:0.9
 
   - vars:
       context: I am a huge fan of the Game of Thrones movie series. I want to read the book series related to movies. Suggest me the books related to the series.
     assert:
       - type: llm-rubric
         value: The response should suggest books belonging to the Game of Thromes series by George R. Matrin. Its also okay to include books belonging to the 'House of the Dragon' series, which is a pre-sequel to the Game of Thrones series.
+      -type:answer-relevance
+        threshold:0.9
+      -type:context-relevance
+        threshold:0.9
+      -type:context-faithfulness
+        threshold:0.9
+
   - vars:
       context:I am a fan of the book Pride and Prejudice by Jane Austin, but I don't like the book 'Wuthering Heights' by the same author. Can u recommend me a good book that would suit my taste?
     assert:
       - type: llm-rubric
         value: The response should suggest books that are similar to the book the 'Pride and Prejudice', and should not recommend the books similar to the book 'Wuthering Heights' even though its from the same author. First differenciate between the 2 books and then identify the category and nature of the content of the book the user likes before the recommendation and then recommend the books.
+      -type:answer-relevance
+        threshold:0.9
+      -type:context-relevance
+        threshold:0.9
+      -type:context-faithfulness
+        threshold:0.9
+
   - vars:
       context: I don't like the book 'Princess Diaries'. Can you suggest me a good book.
     assert:
       - type: llm-rubric
         value: The user data contain only about what is disliked. But it is needed to get data about what is actually like by the user.It should ask the user to enter more details about user's likes and preferences,hobbies, previous books the user has liked,user's age and etc.
+      -type:answer-relevance
+        threshold:0.9
+      -type:context-relevance
+        threshold:0.9
+      -type:context-faithfulness
+        threshold:0.9
+
   - vars:
       context: Can u suggests me some books that have won awards?
     assert:
       - type: llm-rubric
         value: The response should suggest books that have won one or more awards related to literature.
+      -type:answer-relevance
+        threshold:0.9
+      -type:context-relevance
+        threshold:0.9
+      -type:context-faithfulness
+        threshold:0.9
+
   - vars:
       context: I want to buy the book 'The Silmarilion'. Is it available with you? If not can u suggest me a similar book
     assert:
       - type: llm-rubric
         value: The response should suggest the book  'The Silmarilion' if its available. If not, suggests some other books similar to that. The similar books can be from the same or different others that contain similar content.
+      -type:answer-relevance
+        threshold:0.9
+      -type:context-relevance
+        threshold:0.9
+      -type:context-faithfulness
+        threshold:0.9
+
   - vars:
       context: Can u tell me what are the awards and their categories available for authors around the world?
     assert:
       - type: llm-rubric
         value: The response should not suggest any books or answer the question asked since the user is not asking for a book recommendation.
+      -type:answer-relevance
+        threshold:0.9
+      -type:context-relevance
+        threshold:0.9
+      -type:context-faithfulness
+        threshold:0.9
+
   - vars:
       context: can u suggest me some best selling self help and financial advice books?
     assert:
       - type: llm-rubric
         value: The response should suggest the most popular and best selling books belonging to the category 'self help', 'financial advices' or both.
+      -type:answer-relevance
+        threshold:0.9
+      -type:context-relevance
+        threshold:0.9
+      -type:context-faithfulness
+        threshold:0.9

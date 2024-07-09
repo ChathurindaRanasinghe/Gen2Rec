@@ -16,11 +16,24 @@ tests:
     assert:
       - type: llm-rubric
         value: The response should not recommend any vehicles to the user and should encourage the user to give more details about the user's likes and preferences, what the vehicle will be used for and other factors such as fuel consumption, maintainance, interior and exterior and etc.
+      -type:answer-relevance
+        threshold:0.9
+      -type:context-relevance
+        threshold:0.9
+      -type:context-faithfulness
+        threshold:0.9
+  
   - vars:
       context:I need a SUV type vehicle with a mileage less than 100000. It should be white in color and the interior should be black.
     assert:
       - type: llm-rubric
         value: Response should be vehicle/ vehicles of SUV type with less than the given mileage and the exterior should be white and the interior should be black.
+      -type:answer-relevance
+        threshold:0.9
+      -type:context-relevance
+        threshold:0.9
+      -type:context-faithfulness
+        threshold:0.9
 
   - vars:
       context: I need a vehicle to go on off-road adventures with my family. There should be space for at least 4 people in this vehicle.
@@ -28,11 +41,24 @@ tests:
     assert:
       - type: llm-rubric
         value: The suggested vehicle should be of four-wheel drive, suitable height as well as other features such as an engine with a higher amount of horse power and etc. Having extra features such as trailer hooks, fog lamps, hood racks etc. are plus points.
+      -type:answer-relevance
+        threshold:0.9
+      -type:context-relevance
+        threshold:0.9
+      -type:context-faithfulness
+        threshold:0.9
+
   - vars:
       context: The user is a office worker that requires a family car for daily driving. The car should be economical and easily manurable. 
     assert:
       - type: llm-rubric
         value: The response should contain vehicles suitable for daily use with efficient fuel consumption and in the economy to mid luxury level. The maintenance records must be good and the car must be in good condition to run daily.
+      -type:answer-relevance
+        threshold:0.9
+      -type:context-relevance
+        threshold:0.9
+      -type:context-faithfulness
+        threshold:0.9
 
   - vars:
       context:  User is a traveler that loves driving long distances. The vehicle should be high performant and the cost is not an issue.
@@ -40,31 +66,71 @@ tests:
     assert:
       - type: llm-rubric
         value: The results should contain vehicle/vehicles that are suitable for long distance travels with good maintenance records, considerable fuel efficiency. It can belong to any price range from economy to luxury as the price doesn't matter.
+      -type:answer-relevance
+        threshold:0.9
+      -type:context-relevance
+        threshold:0.9
+      -type:context-faithfulness
+        threshold:0.9 
+  
   - vars:
       context: The user needs a vehicle that is multi purpose. User needs to use this vehicle for his office work including staff transportation, transporting small stocks, using for outstation travels on field visits and etc.
 
     assert:
       - type: llm-rubric
         value: The response should contain vehicles that can carry a large number of passengers, preferably a van model. The fuel efficiency of the vehicle should also be on high-mid levels.
+      -type:answer-relevance
+        threshold:0.9
+      -type:context-relevance
+        threshold:0.9
+      -type:context-faithfulness
+        threshold:0.9
+  
   - vars:
       context:User is looking for a luxury vehicle with a good road presence. The vehicle should also have good maintenance records.
     assert:
       - type: llm-rubric
         value: The suggested vehicles should be luxury vehicles belonging to high price range and with a good maintenance history.
+      -type:answer-relevance
+        threshold:0.9
+      -type:context-relevance
+        threshold:0.9
+      -type:context-faithfulness
+        threshold:0.9
+
   - vars:
       context: The user is a huge enthusiast of classic cars. He is specially interested in Italian made cars and mini coopers.
     assert:
       - type: llm-rubric
         value: The response should be according to the user preferences mentioned as classic Italian cars and other types of classic cars including mini coopers.
+      -type:answer-relevance
+        threshold:0.9
+      -type:context-relevance
+        threshold:0.9
+      -type:context-faithfulness
+        threshold:0.9
+  
   - vars:
       context: Can u tell me a brief history about Alpha Romeo cars?
     assert:
       - type: llm-rubric
         value:  The response should not include answers for the users question. It should only contain the idea that the query is invalid.
+      -type:answer-relevance
+        threshold:0.9
+      -type:context-relevance
+        threshold:0.9
+      -type:context-faithfulness
+        threshold:0.9
 
   - vars:
       context: Who is Enzo Ferrari?
     assert:
       - type: llm-rubric
         value:  The response should not include answers for the users question. It should only contain the idea that the query is invalid.
+      -type:answer-relevance
+        threshold:0.9
+      -type:context-relevance
+        threshold:0.9
+      -type:context-faithfulness
+        threshold:0.9
  
