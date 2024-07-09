@@ -20,9 +20,9 @@ METADATA: dict = {
 }
 EMBEDDING_MODELS: list[str] = []
 LARGE_LANGUAGE_MODELS: list[str] = []
-BACKEND_URL: str = "http://192.168.20.170:8001"
+BACKEND_URL: str = "http://10.34.25.211:8000"
 
-client = httpx.Client(timeout=60)
+client = httpx.Client(timeout=600)
 
 
 def update_fields(dataset_file) -> dict:
