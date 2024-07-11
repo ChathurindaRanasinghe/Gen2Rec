@@ -105,3 +105,148 @@ tests:
         threshold:0.9
       -type:context-faithfulness
         threshold:0.9
+
+    - vars:
+      context: I am a secondary school student. I am going to buy my first laptop. I need to use it for editing word documents, playing some video games, watching movies and reading online materials needed for school. Can you suggest me a good laptop
+    assert:
+      - type: llm-rubric
+        value: Recommend a laptop in the starting range with a lower budget.
+      -type:answer-relevance
+        threshold:0.9
+      -type:context-relevance
+        threshold:0.9
+      -type:context-faithfulness
+        threshold:0.9
+    
+    - vars:
+      context:I am a software engineer. I need a laptop with multiple screens as I need to multitask. I am planning to use the laptop for my office work , where I will be mostly working with Visual Studio and Android Studio and I will occasionally be training some machine learning models as well.
+    assert:
+      - type: llm-rubric
+        value: Should recommend a laptop with multiple  screens, and good specs such as high computational power, high storage and a good GPU as well.
+      -type:answer-relevance
+        threshold:0.9
+      -type:context-relevance
+        threshold:0.9
+      -type:context-faithfulness
+        threshold:0.9
+
+    - vars:
+      context: I am a youtuber and a stay at home mom. I need to buy a laptop in the middle price range so that i can use it for my editing work as well as for my children's online classes.
+    assert:
+      - type: llm-rubric
+        value: Recommend a laptop in the low-middle price range , suitable for video editing.
+      -type:answer-relevance
+        threshold:0.9
+      -type:context-relevance
+        threshold:0.9
+      -type:context-faithfulness
+        threshold:0.9
+
+    - vars:
+      context:I am a professional game streamer. I need a good laptop with the most recent specs. Suggest me a good laptop
+    assert:
+      - type: llm-rubric
+        value:Recommend a high end gaming laptop with the most recent high end specifications suitable for gaming.
+      -type:answer-relevance
+        threshold:0.9
+      -type:context-relevance
+        threshold:0.9
+      -type:context-faithfulness
+        threshold:0.9
+
+    - vars:
+      context: I am a small business owner. I need a laptop mainly to keep the accounts of my business and to manage the operational activities such as accepting orders, order tracking etc. Suggest me a good laptop please. My budget limit is Rs.150000
+    assert:
+      - type: llm-rubric
+        value: Recommend a laptop that is within the budget range of the user and with low-medium specs as the user's requirements do not need a high tech laptop.
+      -type:answer-relevance
+        threshold:0.9
+      -type:context-relevance
+        threshold:0.9
+      -type:context-faithfulness
+        threshold:0.9
+
+    - vars:
+      context: I need to buy a laptop for my son who is in 5th grade, to use for his online classes.Suggest me a good laptop
+    assert:
+      - type: llm-rubric
+        value: Recommend a laptop with minimum specs and in the low budget range, suitable for a school student.
+      -type:answer-relevance
+        threshold:0.9
+      -type:context-relevance
+        threshold:0.9
+      -type:context-faithfulness
+        threshold:0.9
+
+    - vars:
+      context: I need to start freelancing. I am planning to do freelancing related to NFT drawing and other drawing and animated related work. Recommend me a good laptop.
+    assert:
+      - type: llm-rubric
+        value: Recommend a laptop with medium-high specs, the laptop should have a writing screen and a separate writing pen/ device for it so that the user can use it easily for his art work. It is a plus point if the recommended laptop is popular among artists or is specially designed for artists.
+      -type:answer-relevance
+        threshold:0.9
+      -type:context-relevance
+        threshold:0.9
+      -type:context-faithfulness
+        threshold:0.9
+
+    - vars:
+      context:I need a laptop with 1 TB SSD, i9 10th gen or newer processor and a GPU of more than 2 GB. The battery life should be more than 60 Ampere hours.
+    assert:
+      - type: llm-rubric
+        value: Strictly adhere to the requirements of the user. Should acknowledge the user if there is a list of laptops relevant to the criteria that only a set of laptops are shown and ask the user to enter more specific criteria for his/her personal requirement so that further filtering can be done.
+      -type:answer-relevance
+        threshold:0.9
+      -type:context-relevance
+        threshold:0.9
+      -type:context-faithfulness
+        threshold:0.9
+
+    - vars:
+      context: I need laptop with 32GB RAM and from Asus. It should be light weight and have a good battery life so that I can take it to work everyday.
+    assert:
+      - type: llm-rubric
+        value: The response should not include answers for the users question. It should only contain the idea that the query is invalid.
+      -type:answer-relevance
+        threshold:0.9
+      -type:context-relevance
+        threshold:0.9
+      -type:context-faithfulness
+        threshold:0.9
+
+    - vars:
+      context: I need laptop with 32GB RAM and from Asus. It should be light weight and have a good battery life so that I can take it to work everyday.
+    assert:
+      - type: llm-rubric
+        value: Adhere to the requirement of the user, and recommend suitable laptops. Should acknowledge the user if there is a list of laptops relevant to the criteria that only a set of laptops are shown and ask the user to enter more specific criteria for his/her personal requirement so that further filtering can be done.
+      -type:answer-relevance
+        threshold:0.9
+      -type:context-relevance
+        threshold:0.9
+      -type:context-faithfulness
+        threshold:0.9
+
+    - vars:
+      context: Can u recommend me some famous laptop models from HP in the medium price range?
+    assert:
+      - type: llm-rubric
+        value: Recommend laptops in the medium specs range and the answer must be popular and widely used.
+      -type:answer-relevance
+        threshold:0.9
+      -type:context-relevance
+        threshold:0.9
+      -type:context-faithfulness
+        threshold:0.9
+
+    - vars:
+      context:I need to buy a good gaming laptop from MSI. I am also a university student, so i need to use it for my university work as well. Also i don't want it to be too heavy as I will have to take it to university everyday. Please suggest me a good laptop in the medium price range
+    assert:
+      - type: llm-rubric
+        value: Recommend a gaming laptop from the given brand, it should be suitable for gaming and also for the user's day to day. Also the laptop must be among the light weight laptops in the MSI brand.
+      -type:answer-relevance
+        threshold:0.9
+      -type:context-relevance
+        threshold:0.9
+      -type:context-faithfulness
+        threshold:0.9
+
