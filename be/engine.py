@@ -14,9 +14,12 @@ from langchain_community.vectorstores import Qdrant
 from langchain_core.documents.base import Document
 from langchain_core.embeddings import Embeddings
 from langchain_core.language_models.chat_models import BaseChatModel
+from langchain_core.messages import AIMessage
 from langchain_core.messages import HumanMessage
+from langchain_core.messages import SystemMessage
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_core.prompts import HumanMessagePromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_voyageai import VoyageAIEmbeddings
@@ -43,7 +46,7 @@ class RecommendationEngine:
             #     model=LargeLanguageModels.OpenAI.GPT_4O, verbose=False, temperature=0
             # )
             self._llm = ChatOpenAI(
-                model=LargeLanguageModels.OpenAI.GPT_35_TURBO,
+                model=LargeLanguageModels.OpenAI.GPT_4O,
                 verbose=False,
                 temperature=0,
             )
@@ -64,6 +67,7 @@ class RecommendationEngine:
         self._chat_history = []
         self._embedding_columns = None
         self._dataset_file_path = None
+        self.user_details = None
 
     @property
     def available_embedding_models(self) -> List[str]:
@@ -273,10 +277,10 @@ class RecommendationEngine:
             )
 
         rag_chain_from_docs = (
-            RunnablePassthrough.assign(context=(lambda x: format_docs(x["context"])))
-            | self.system_prompt
-            | self.llm
-            | StrOutputParser()
+                RunnablePassthrough.assign(context=(lambda x: format_docs(x["context"])))
+                | self.system_prompt
+                | self.llm
+                | StrOutputParser()
         )
 
         self._recommendation_pipeline = create_retrieval_chain(
@@ -288,20 +292,23 @@ class RecommendationEngine:
         return self._chat_history
 
     async def run_recommendation_system(
-        self, query: str, recommendation_only: bool = False, stream: bool = False
+            self, query: str, recommendation_only: bool = False, stream: bool = False
     ):
-        logger.info(f"Running recommendation system for query: {query}")
-        output = await self.recommendation_pipeline.ainvoke(
-            {"input": query, "chat_history": self.chat_history}
-        )
-        # self.recommendation_pipeline.stream()
-        self.chat_history.extend([HumanMessage(content=query), output["answer"]])
-        return output
+        if self.check_query(prompt=query):
+            logger.info(f"Running recommendation system for query: {query}")
+            output = await self.recommendation_pipeline.ainvoke(
+                {"input": query, "chat_history": self.chat_history}
+            )
+            # self.recommendation_pipeline.stream()
+            self.chat_history.extend([HumanMessage(content=query), output["answer"]])
+            return output
+        else:
+            return {"answer": "INVALID QUERY"}
 
     async def run_recommendation_system_stream(self, query: str):
         logger.info(f"Running (stream) recommendation system for query: {query}")
         async for chunk in self.recommendation_pipeline.astream(
-            {"input": query, "chat_history": []}
+                {"input": query, "chat_history": []}
         ):
             logger.info(f"Chunk: {chunk}")
             if "answer" in chunk:
@@ -339,12 +346,12 @@ class RecommendationEngine:
         self._collection_name = name
 
     def load_dataset(
-        self,
+            self,
     ) -> List[Document]:
         docs = []
         encodings = detect_file_encodings(self.dataset_file_path)
         with open(
-            self.dataset_file_path, "r", encoding=encodings[0].encoding
+                self.dataset_file_path, "r", encoding=encodings[0].encoding
         ) as csv_file:
             reader = csv.DictReader(csv_file)
             for index, row in enumerate(reader):
@@ -365,23 +372,34 @@ class RecommendationEngine:
 
         return docs
 
-    def check_query(self) -> bool:
-        def parser(ai_message) -> bool:
-            print(ai_message)
+    def check_query(self, prompt) -> bool:
+        logger.info("Running guardrails")
 
-        prompt = ChatPromptTemplate.from_messages(
+        def parser(ai_message: AIMessage) -> bool:
+            logger.info(f"{ai_message.content=}")
+            if ai_message.content.lower() == "false" or "false" in ai_message.content.lower():
+                logger.info("Invalid Request")
+                return False
+            logger.info("Valid Request")
+            return True
+
+        system_message_content = process_template(
+            self._guard_rails_prompt_path, {"category": self.category}
+        )
+        logger.info(system_message_content)
+        prompt_template = ChatPromptTemplate.from_messages(
             [
-                (
-                    "system",
-                    process_template(
-                        self._guard_rails_prompt_path, {"category": self.category}
-                    ),
-                ),
-                ("human", MessagesPlaceholder("query")),
+                SystemMessage(content=system_message_content),
+                HumanMessagePromptTemplate.from_template("{query}")
             ]
         )
 
-        # guard_chain =
+        llm = ChatOpenAI(
+            model=LargeLanguageModels.OpenAI.GPT_4O, verbose=False, temperature=0
+        )
+
+        guardrails_chain = prompt_template | llm | parser
+        return guardrails_chain.invoke({"query": prompt})
 
     @property
     def embeddings_available(self):

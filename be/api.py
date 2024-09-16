@@ -56,7 +56,7 @@ async def config(request: Request):
     logger.info(data)
     recommendation_engine.llm = data["large_language_model"]
 
-    # TODO: Process user details
+    recommendation_engine.user_details = data["user_details"]
 
     return "Config successfully updated"
 
@@ -64,9 +64,15 @@ async def config(request: Request):
 @app.get("/recommendations")
 async def recommendations(number: int):
     # TODO: Process user details
+    if recommendation_engine.user_details is None:
+        query = f"Give me {number} {recommendation_engine.category} recommendations"
+    else:
+        query = f"Give {number} {recommendation_engine.category} recommendations for following user details.\n{recommendation_engine.user_details}"
+    logger.info(f"{query=}")
     output = await recommendation_engine.run_recommendation_system(
-        query=f"Give me {number} {recommendation_engine.category} recommendations"
+        query=query
     )
+    # assert len(output["context"]) == number
     return output["context"]
 
 

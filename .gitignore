@@ -16,3 +16,5 @@ redis-local-data
 demo-*.yaml
 persistent-embeddings
 temp*
+
+local-embeddings
