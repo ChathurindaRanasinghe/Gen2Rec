@@ -23,7 +23,7 @@ delete-venv:
 
 .PHONY: run-ui
 run-ui:
-	streamlit run fe/chat_interface.py
+	python fe/client_interface.py
 
 .PHONY: run-laptop-ui
 run-laptop-ui:
