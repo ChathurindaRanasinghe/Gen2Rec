@@ -23,7 +23,20 @@ delete-venv:
 
 .PHONY: run-ui
 run-ui:
-	streamlit run gen2rec/user-interface/chat_interface.py
+	streamlit run fe/chat_interface.py
+
+.PHONY: run-laptop-ui
+run-laptop-ui:
+	panel serve fe/usecases/laptop_usecase.py
+
+.PHONY: run-movie-ui
+run-movie-ui:
+	panel serve fe/usecases/movie_usecase.py
+
+.PHONY: run-news-ui
+run-news-ui:
+	panel serve fe/usecases/news_usecase.py
+
 
 # .PHONY: start-vecdb
 # start-vecdb:
