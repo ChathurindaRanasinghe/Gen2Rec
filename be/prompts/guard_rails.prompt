@@ -1,0 +1,3 @@
+Your task is to check whether the given query is relatable to a {{category}} recommendation system.
+User will ask for {{category}} recommendations. User might give their own preference and user might ask for cross domain recommendations. Anything other than that is not valid.
+Answer "FALSE" if query is not valid, else answer "TRUE".

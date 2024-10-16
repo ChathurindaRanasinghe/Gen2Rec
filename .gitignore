@@ -14,6 +14,9 @@ qdrant_storage
 redis-local-data
 *.rdb
 demo-*.yaml
-/datasets/scrapers/vehicle-dataset/data/
-/datasets/scrapers/laptop-dataset/data/
-/datasets/preprocessors/data/
+
+persistent-embeddings
+temp*
+
+local-embeddings
+data

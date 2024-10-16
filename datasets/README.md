@@ -1,11 +1,10 @@
 # Datasets
 
-Datasets of 8 categories are available. These are used as the embeddings for different recommendation categories.
+Datasets of 8 categories are available. These are chosen to demonstrate the generalizability of the system. 
 
 ## Dataset Specification
 
-Here are the basic datasets used and the sizes of each dataset after processing. Datasets are formatted and customized
-as required and some are improved with external knowledge.
+Here are the datasets used and the sizes of each dataset after processing. Datasets are formatted and customized as required and some are improved with external knowledge.
 
 | Category | Base Dataset                                                                          | Size   | Processing                                                                                                               |
 |----------|---------------------------------------------------------------------------------------|--------|--------------------------------------------------------------------------------------------------------------------------|
@@ -18,5 +17,6 @@ as required and some are improved with external knowledge.
 | Music    | [Spotify dataset](https://www.kaggle.com/datasets/vatsalmavani/spotify-dataset)       | 170653 | -                                                                                                                        |
 | Vehicle  | Custom ([scraped](https://www.usedcars.com/))                                         | 2488   | Data is formatted and structured as required.                                                                            |
 
-Find the processed
-datasets [here](https://drive.google.com/drive/folders/1S9R76Hog0sK6cqWlwWIFauwS587-ianM?usp=sharing).
+***
+
+Find datasets [here](https://drive.google.com/drive/folders/1S9R76Hog0sK6cqWlwWIFauwS587-ianM?usp=sharing).

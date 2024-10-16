@@ -19,24 +19,25 @@ setup-test-env: venv
 delete-venv:
 	rm -rf ./venv
 
-.PHONY: run
+
 
 
 .PHONY: run-ui
 run-ui:
-	python gen2rec/user-interface/client_interface.py
+	python fe/client_interface.py
 
 .PHONY: run-laptop-ui
 run-laptop-ui:
-	panel serve usecases/laptop_usecase.py
+	panel serve fe/usecases/laptop_usecase.py
 
 .PHONY: run-movie-ui
 run-movie-ui:
-	panel serve usecases/movie_usecase.py
+	panel serve fe/usecases/movie_usecase.py
 
 .PHONY: run-news-ui
 run-news-ui:
-	panel serve usecases/news_usecase.py
+	panel serve fe/usecases/news_usecase.py
+
 
 # .PHONY: start-vecdb
 # start-vecdb:
@@ -46,6 +47,9 @@ run-news-ui:
 start-redis:
 	docker run -d -p 6379:6379 -p 8001:8001 -v $(shell pwd)/redis-local-data/:/data redis/redis-stack:latest
 
+.PHONY: run
+run:
+	fastapi run be/api.py
 
 # export PYTHONPATH="${PYTHONPATH}:$(pwd)"
 
