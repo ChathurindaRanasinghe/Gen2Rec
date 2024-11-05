@@ -1,18 +1,52 @@
 # Gen2Rec
 
-Gen2Rec marks the next generation of recommendation systems providing a **Generalized Framework for using Large Language Models as recommendation processes** which enables more personalized, context aware recommendations and engagement with the recommendation system.
+<p align="center">
+    <img alt="Gen2Rec" src="assets\gen2rec-white-logo.png" width=300px/>
+</p>
 
-Key Features:
+Gen2Rec is a **Generalized Framework for using Large Language Models (LLMs) in recommendation processes**. This framework enhances recommendation systems by delivering personalized, context-aware suggestions that adapt to user needs and engagement patterns, making recommendations more insightful and relevant.
+
+
+## Key Features
+
 - Generalizability across different categories.
-- Explainable and cross-domain recommendations.
-- User and contextual data integration and personalized, context-aware suggestions.
+- Explainable recommendations.
+- Cross-domain recommendations.
+- Data pre-processing with LLMs.
+- Flexibility in model selection.
+- User and contextual data integration.
 - Better natural language understanding.
-- Flexibility in model selection and lower resource usage.
-- Scalability, reduced computational resources, and no vendor lock-in.
+- Lower computational resource usage.
+- Scalability and vendor independence.
+
+
+## Background and Motivation 
+
+Aims to overcome issues with existing systems such as:
+- Require significant time and resources for model training.
+- Limited capability in processing natural language.
+- Less flexibility (need to change weights to modify behavior).
+- Lower generalizability.
+
+How Gen2Rec solves these challenges:
+- Provides a generalized framework to create recommendation systems.
+- Incorporates Large Language Models (LLMs).
+- Leverages Retrieval Augmented Generation (RAG) for more personalized, efficient recommendations.
 
 
 ## Design & Architecture
-Mainly consists of 3 components.
-1. Chat Interface
-2. Prompt Constructor
-3. Recommendation Engine
+
+<img alt="Design" src="assets\final-design.jpg" width=100%/>
+
+
+## Usage
+
+
+## Results
+
+
+## Future Scope
+
+
+#### See more
+- [Demo](https://youtu.be/zfunqsigMlI)
